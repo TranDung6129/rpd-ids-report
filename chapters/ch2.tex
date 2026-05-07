@@ -1,7 +1,407 @@
 % ============================================================
-%  Chapter 2.tex — CƠ SỞ LÝ THUYẾT
+%  chapters/ch2.tex — Chương 2: Cơ sở lý thuyết
 % ============================================================
 \section{CƠ SỞ LÝ THUYẾT}
 \label{sec:ch2}
 
-% TODO: Nội dung chương 2.
+% ============================================================
+\subsection{Giao thức RPL}
+\label{subsec:rpl}
+% ============================================================
+
+\subsubsection{Tổng quan về RPL}
+
+Giao thức \textbf{RPL} (\textit{IPv6 Routing Protocol for Low-Power and
+Lossy Networks}) được IETF chuẩn hóa theo RFC~6550 năm 2012, là giao thức
+định tuyến chuẩn \textit{de facto} cho các mạng IoT năng lượng thấp và mất
+mát cao (LLN) \cite{winter2012rpl}. RPL hoạt động ở tầng mạng, theo hướng
+tiếp cận định tuyến vector khoảng cách (distance vector), và tổ chức mạng
+thành cấu trúc đồ thị acyclic có hướng tập trung vào đích (DODAG).
+
+RPL được thiết kế để đáp ứng bốn mô hình truyền thông chính trong IoT:
+
+\begin{itemize}
+    \item \textbf{Nhiều-đến-một (Many-to-One):} Các nút cảm biến gửi dữ
+          liệu về nút gốc. Đây là mô hình phổ biến nhất trong thu thập
+          dữ liệu cảm biến.
+    \item \textbf{Một-đến-nhiều (One-to-Many):} Nút gốc phát lệnh hoặc
+          cấu hình xuống các nút cảm biến (downward routing).
+    \item \textbf{Điểm-đến-điểm (Point-to-Point):} Hai nút bất kỳ trao
+          đổi trực tiếp thông qua nút gốc.
+    \item \textbf{Đa điểm-đến-đa điểm (Multipoint-to-Multipoint):} Hỗ
+          trợ qua các cơ chế mở rộng.
+\end{itemize}
+
+\subsubsection{Cấu trúc DODAG}
+
+\textbf{DODAG} (\textit{Destination Oriented Directed Acyclic Graph}) là
+cấu trúc tô-pô cốt lõi mà RPL xây dựng và duy trì. Mỗi DODAG được đặc
+trưng bởi:
+
+\begin{itemize}
+    \item \textbf{DODAG Root (Nút gốc / Border Router -- BR):} Nút đặc
+          biệt kết nối LLN với mạng IP bên ngoài. Mọi luồng upward đều
+          hướng về nút này.
+    \item \textbf{DODAGID:} Địa chỉ IPv6 toàn cục duy nhất định danh
+          một DODAG.
+    \item \textbf{DODAGVersionNumber:} Bộ đếm 8-bit, tăng mỗi khi nút
+          gốc khởi tạo tái cấu trúc tô-pô toàn cục (global repair).
+    \item \textbf{Rank:} Giá trị số nguyên không âm biểu diễn vị trí
+          tương đối của nút so với nút gốc. Nút gốc có Rank = 1; các
+          nút càng xa gốc có Rank càng lớn. Rank đóng vai trò quan trọng
+          trong việc ngăn chặn vòng lặp định tuyến.
+\end{itemize}
+
+Mỗi nút không phải gốc phải chọn một \textbf{nút cha ưu tiên}
+(\textit{preferred parent}) trong số các nút có Rank nhỏ hơn. Tập hợp
+các nút cha khả dĩ tạo thành \textit{parent set}. Luồng dữ liệu upward
+đi từ nút lá (leaf node) qua các nút cha lên tới nút gốc theo cấu trúc
+cây phân cấp.
+
+\subsubsection{Các bản tin điều khiển RPL}
+
+RPL sử dụng bốn loại bản tin điều khiển ICMPv6 để xây dựng và duy trì
+DODAG \cite{prajisha2025dis}:
+
+\paragraph{DODAG Information Object (DIO)}
+DIO là bản tin quảng bá định tuyến quan trọng nhất. Nút gốc phát DIO
+multicast định kỳ; các nút trung gian sau khi nhận DIO sẽ cập nhật thông
+tin và chuyển tiếp DIO xuống các nút con. DIO chứa các trường chính:
+DODAGID, DODAGVersionNumber, Rank của người gửi, Mode of Operation (MOP)
+và thông tin Objective Function.
+
+\paragraph{DODAG Information Solicitation (DIS)}
+DIS là bản tin yêu cầu thông tin DODAG, được một nút gửi khi muốn gia
+nhập hoặc tái gia nhập mạng. Khi nhận DIS, các nút hàng xóm đang là thành
+viên DODAG sẽ phản hồi bằng DIO và \textbf{reset bộ hẹn giờ Trickle},
+dẫn đến phát DIO ngay lập tức thay vì chờ hết chu kỳ hiện tại.
+
+\paragraph{Destination Advertisement Object (DAO)}
+DAO được gửi theo hướng upward để thông báo khả năng tiếp cận
+(\textit{reachability}) của các nút xuôi dòng. Nút gốc dùng thông tin
+DAO để xây dựng bảng định tuyến downward, cho phép gửi dữ liệu từ gốc
+xuống bất kỳ nút nào trong DODAG.
+
+\paragraph{DAO Acknowledgment (DAO-ACK)}
+DAO-ACK xác nhận việc tiếp nhận và xử lý thành công một bản tin DAO,
+đảm bảo độ tin cậy trong việc thiết lập đường định tuyến downward.
+
+\subsubsection{Bộ hẹn giờ Trickle}
+
+\textbf{Trickle Timer} là cơ chế điều tiết tần suất phát bản tin DIO,
+cho phép RPL thích ứng với điều kiện mạng \cite{prajisha2025dis}. Hoạt
+động theo nguyên tắc:
+
+\begin{enumerate}
+    \item Mỗi chu kỳ $I$ bắt đầu với khoảng thời gian $I_{min}$ và tăng
+          gấp đôi sau mỗi chu kỳ ổn định, tới giới hạn $I_{max}$.
+    \item Trong mỗi chu kỳ, nút đếm số lần nghe thấy DIO nhất quán
+          (counter $c$). Nếu $c < k$ (redundancy constant), nút phát
+          DIO tại thời điểm ngẫu nhiên trong $[I/2, I]$.
+    \item Khi phát hiện không nhất quán (nhận DIS, thay đổi parent,
+          routing loop...), Trickle Timer bị \textbf{reset} về $I_{min}$,
+          kích hoạt phát DIO ngay lập tức để sửa chữa nhanh.
+\end{enumerate}
+
+Cơ chế này giảm thiểu overhead điều khiển khi mạng ổn định, nhưng cũng
+là điểm yếu bị khai thác bởi DIS Flooding Attack.
+
+\subsubsection{Objective Function}
+
+\textbf{Objective Function (OF)} là tập quy tắc xác định cách tính Rank
+từ các routing metrics và cách chọn preferred parent \cite{decrank2022}.
+RPL chuẩn hóa hai OF:
+
+\begin{itemize}
+    \item \textbf{OF0} (RFC~6552): Tối thiểu hóa số hop đến nút gốc.
+          Rank được tính bằng cách cộng một giá trị không đổi
+          (rank-increase) vào Rank của preferred parent. OF0 luôn chọn
+          nút có Rank thấp nhất làm parent mà không có cơ chế chống
+          dao động (anti-churn), khiến nó dễ bị ảnh hưởng bởi
+          Decreased Rank Attack.
+    \item \textbf{MRHOF} (RFC~6719): Sử dụng metric ETX (Expected
+          Transmission Count) để chọn đường có chất lượng link tốt nhất.
+          MRHOF tích hợp \textit{hysteresis} --- nút chỉ thay đổi parent
+          khi ETX mới tốt hơn ngưỡng $\Delta_{ETX}$ so với parent hiện
+          tại, giúp giảm parent churn nhưng vẫn có thể bị tấn công Rank
+          nếu $\Delta_{ETX}$ đủ lớn.
+\end{itemize}
+
+% ============================================================
+\subsection{Phân loại tấn công RPL}
+\label{subsec:attack_taxonomy}
+% ============================================================
+
+Theo khung phân loại được trình bày trong \cite{overview_rpl_framework},
+các tấn công vào RPL được tổ chức thành ba nhóm chính, phản ánh ba chiều
+tác động khác nhau lên mạng:
+
+\subsubsection{Nhóm tấn công tài nguyên (Resources)}
+
+Mục tiêu là làm cạn kiệt năng lượng, bộ nhớ hoặc băng thông của các nút
+hợp lệ, từ đó rút ngắn tuổi thọ mạng. Nhóm này chia thành hai loại:
+
+\begin{itemize}
+    \item \textbf{Tấn công trực tiếp (Direct):} Nút độc hại trực tiếp
+          tạo ra lưu lượng quá mức. Ví dụ điển hình: \textit{DIS Flooding
+          Attack} --- phát tán DIS liên tục khiến mạng bùng nổ DIO.
+    \item \textbf{Tấn công gián tiếp (Indirect):} Nút độc hại kích thích
+          các nút hợp lệ tạo ra lưu lượng dư thừa. Ví dụ:
+          \textit{Version Number Attack} --- tăng DODAGVersionNumber bất
+          hợp pháp buộc toàn mạng tái cấu trúc.
+\end{itemize}
+
+\subsubsection{Nhóm tấn công tô-pô (Topology)}
+
+Mục tiêu là phá vỡ cấu trúc DODAG, gây định tuyến sai hoặc cô lập nút.
+Chia thành:
+
+\begin{itemize}
+    \item \textbf{Sub-optimization:} Mạng hội tụ về trạng thái không
+          tối ưu, giảm hiệu năng nhưng không cắt đứt kết nối hoàn toàn.
+          Ví dụ: \textit{Decreased Rank Attack}, \textit{Routing Table
+          Falsification}.
+    \item \textbf{Isolation:} Một hoặc nhiều nút bị cô lập khỏi DODAG.
+          Ví dụ: \textit{Blackhole Attack}, \textit{Sinkhole Attack},
+          \textit{Wormhole Attack}.
+\end{itemize}
+
+\subsubsection{Nhóm tấn công lưu lượng (Traffic)}
+
+Mục tiêu là khai thác hoặc giả mạo dữ liệu lưu thông trong mạng. Chia
+thành:
+
+\begin{itemize}
+    \item \textbf{Eavesdropping (Passive):} Nghe trộm lưu lượng mà không
+          can thiệp. Ví dụ: \textit{Sniffing}, \textit{Traffic Analysis}.
+    \item \textbf{Misappropriation (Active):} Chiếm đoạt và thay đổi
+          lưu lượng. Ví dụ: \textit{Decreased Rank Attack},
+          \textit{Identity Attack}.
+\end{itemize}
+
+% ============================================================
+\subsection{Tổng quan về IDS trong IoT/LLN}
+\label{subsec:ids_overview}
+% ============================================================
+
+\subsubsection{Khái niệm và phân loại IDS}
+
+\textbf{Hệ thống Phát hiện Xâm nhập} (IDS) là tập hợp các công cụ và
+phương pháp giám sát hoạt động mạng hoặc hệ thống, phát hiện các hành
+vi bất thường hoặc vi phạm chính sách bảo mật. Trong môi trường
+IoT/LLN, IDS phải đối mặt với thách thức đặc biệt: tài nguyên tính toán
+cực kỳ hạn chế, môi trường truyền thông không đáng tin cậy và tô-pô mạng
+thay đổi động.
+
+Các IDS cho RPL/LLN được phân loại theo hai chiều chính:
+
+\paragraph{Theo phương pháp phát hiện:}
+\begin{itemize}
+    \item \textbf{Signature-based:} So sánh hành vi quan sát được với
+          cơ sở dữ liệu mẫu tấn công đã biết. Độ chính xác cao, FPR thấp
+          nhưng không phát hiện được tấn công mới (zero-day).
+    \item \textbf{Anomaly-based:} Xây dựng mô hình hành vi bình thường
+          và phát hiện lệch chuẩn. Phát hiện được tấn công mới nhưng
+          FPR thường cao hơn.
+    \item \textbf{Threshold-based:} Dạng đặc biệt của anomaly-based,
+          sử dụng ngưỡng cố định hoặc động cho các metrics cụ thể (tần
+          suất DIS, PDR, Rank...). Nhẹ nhàng, phù hợp với LLN.
+    \item \textbf{Hybrid:} Kết hợp nhiều phương pháp để tận dụng ưu
+          điểm của từng loại \cite{prajisha2025dis}.
+\end{itemize}
+
+\paragraph{Theo kiến trúc triển khai:}
+\begin{itemize}
+    \item \textbf{Centralized:} IDS tập trung tại nút gốc hoặc server
+          ngoài. Xử lý mạnh nhưng tạo điểm đơn hỏng (single point of
+          failure) và overhead truyền thông cao.
+    \item \textbf{Distributed:} Mỗi nút chạy module IDS cục bộ, chia
+          sẻ thông tin với hàng xóm. Khả năng mở rộng tốt, phù hợp LLN.
+    \item \textbf{Hybrid:} Kết hợp giám sát cục bộ tại mỗi nút với
+          phân tích tổng hợp tại nút gốc \cite{prajisha2025dis}.
+\end{itemize}
+
+\subsubsection{Thách thức IDS trong LLN}
+
+Thiết kế IDS cho RPL/LLN phải giải quyết các thách thức đặc thù:
+
+\begin{enumerate}
+    \item \textbf{Ràng buộc tài nguyên:} Nút cảm biến thường chỉ có
+          vài KB RAM, vài chục KB Flash và nguồn pin giới hạn. IDS không
+          được tiêu tốn quá nhiều CPU cycles hay bộ nhớ.
+    \item \textbf{Môi trường truyền thông không tin cậy:} Packet loss
+          tự nhiên cao (LLN) có thể bị nhầm là tấn công Blackhole, gây
+          FPR cao.
+    \item \textbf{Tô-pô động:} Thay đổi parent hợp lệ (do di chuyển,
+          pin yếu) có thể giống với dấu hiệu tấn công.
+    \item \textbf{Phân biệt tấn công và lỗi mạng:} Cần cơ chế phân
+          biệt hành vi độc hại với lỗi giao thức thông thường.
+\end{enumerate}
+
+% ============================================================
+\subsection{Các chỉ số đánh giá hiệu năng}
+\label{subsec:metrics}
+% ============================================================
+
+Để đánh giá toàn diện tác động của tấn công và hiệu quả của IDS, đồ án
+sử dụng hai nhóm chỉ số sau:
+
+\subsubsection{Chỉ số hiệu năng mạng}
+
+\paragraph{Packet Delivery Ratio (PDR)}
+PDR đo tỉ lệ gói dữ liệu được gửi thành công đến đích trên tổng số gói
+được phát đi:
+\begin{equation}
+    \text{PDR} = \frac{N_{\text{received}}}{N_{\text{sent}}} \times 100\%
+    \label{eq:pdr}
+\end{equation}
+PDR là chỉ số phản ánh trực tiếp nhất mức độ ảnh hưởng của tấn công lên
+dịch vụ dữ liệu. Tấn công Blackhole và Decreased Rank làm giảm PDR đáng
+kể; tấn công DIS Flooding và VeRA gây suy giảm PDR gián tiếp qua
+overhead điều khiển.
+
+\paragraph{End-to-End Delay (E2ED)}
+E2ED là thời gian trung bình từ khi một gói dữ liệu được phát cho đến
+khi đến đích thành công:
+\begin{equation}
+    \text{E2ED} = \frac{1}{N_{\text{received}}}
+    \sum_{i=1}^{N_{\text{received}}} (t_{\text{receive},i} -
+    t_{\text{send},i})
+    \label{eq:e2ed}
+\end{equation}
+E2ED tăng khi mạng bị tắc nghẽn (DIS Flooding) hoặc khi gói phải truyền
+qua đường dài hơn do tô-pô bị méo (Decreased Rank).
+
+\paragraph{Control Overhead (CO)}
+CO đo số lượng bản tin điều khiển RPL (DIO, DIS, DAO) phát sinh trong
+một khoảng thời gian quan sát. Tấn công DIS Flooding và VeRA trực tiếp
+làm tăng CO lên nhiều lần so với baseline.
+
+\paragraph{Power Consumption}
+Tiêu thụ năng lượng trung bình của mỗi nút (mW hoặc mJ), đo bằng công
+cụ Powertrace trong Contiki-NG. Năng lượng tiêu thụ tăng khi nút phải
+xử lý nhiều bản tin điều khiển hơn hoặc phải tái cấu trúc tô-pô thường
+xuyên.
+
+\subsubsection{Chỉ số đánh giá IDS}
+
+\paragraph{True Positive Rate (TPR) -- Detection Rate}
+Tỉ lệ các cuộc tấn công thực sự được IDS phát hiện đúng:
+\begin{equation}
+    \text{TPR} = \frac{TP}{TP + FN} \times 100\%
+    \label{eq:tpr}
+\end{equation}
+trong đó $TP$ là số trường hợp tấn công phát hiện đúng, $FN$ là số
+trường hợp tấn công bị bỏ sót.
+
+\paragraph{False Positive Rate (FPR)}
+Tỉ lệ các trường hợp bình thường bị IDS cảnh báo nhầm là tấn công:
+\begin{equation}
+    \text{FPR} = \frac{FP}{FP + TN} \times 100\%
+    \label{eq:fpr}
+\end{equation}
+trong đó $FP$ là số cảnh báo nhầm, $TN$ là số trường hợp bình thường
+được phân loại đúng. FPR cao làm tăng overhead và gây phiền nhiễu vận
+hành.
+
+\paragraph{Ma trận nhầm lẫn (Confusion Matrix)}
+Tổng hợp kết quả phân loại của IDS qua bốn giá trị TP, TN, FP, FN như
+Bảng~\ref{tab:confusion_matrix}.
+
+\begin{table}[H]
+\centering
+\caption{Ma trận nhầm lẫn của IDS}
+\label{tab:confusion_matrix}
+\begin{tabularx}{0.7\textwidth}{C{1} C{1.2} C{1.2}}
+    \toprule
+    & \textbf{Thực tế: Tấn công} & \textbf{Thực tế: Bình thường} \\
+    \midrule
+    \textbf{Dự đoán: Tấn công}   & TP & FP \\
+    \textbf{Dự đoán: Bình thường} & FN & TN \\
+    \bottomrule
+\end{tabularx}
+\end{table}
+
+% ============================================================
+\subsection{Môi trường mô phỏng: Contiki-NG và Cooja}
+\label{subsec:simulation_env}
+% ============================================================
+
+\subsubsection{Contiki-NG}
+
+\textbf{Contiki-NG} là hệ điều hành mã nguồn mở, nhẹ nhàng dành riêng
+cho các thiết bị IoT nhúng hạn chế tài nguyên. Contiki-NG là phiên bản
+kế thừa và được tái cấu trúc hoàn toàn từ Contiki OS, với các cải tiến
+về độ ổn định, bảo mật và khả năng kiểm thử. Một số đặc điểm nổi bật:
+
+\begin{itemize}
+    \item Hỗ trợ đầy đủ ngăn xếp IPv6/6LoWPAN và RPL theo RFC~6550.
+    \item Lập lịch phân tán dựa trên protothreads, tiêu thụ rất ít bộ
+          nhớ (vài KB RAM).
+    \item Công cụ \textbf{Powertrace} cho phép đo tiêu thụ năng lượng
+          chi tiết theo từng module (CPU, radio Tx, radio Rx...).
+    \item Tích hợp sẵn Cooja Simulator và hỗ trợ cross-compile cho
+          nhiều phần cứng (Tmote Sky, Zolertia RE-Mote, nRF52840...).
+\end{itemize}
+
+\subsubsection{Cooja Simulator}
+
+\textbf{Cooja} là bộ mô phỏng mạng cảm biến tích hợp trong Contiki-NG,
+cho phép mô phỏng hàng chục đến hàng trăm nút trên một máy tính thông
+thường \cite{overview_rpl_framework}. Đặc điểm:
+
+\begin{itemize}
+    \item \textbf{Mô phỏng mức bytecode:} Chạy trực tiếp bytecode của
+          Contiki-NG, đảm bảo hành vi hoàn toàn giống phần cứng thực.
+    \item \textbf{Mô hình radio linh hoạt:} Hỗ trợ Unit Disk Graph
+          Medium (UDGM -- lý tưởng) và UDGM Distance Loss (có suy hao
+          theo khoảng cách). Đồ án sử dụng UDGM Distance Loss để mô
+          phỏng thực tế hơn.
+    \item \textbf{Scripting:} Hỗ trợ script JavaScript để tự động hóa
+          thực nghiệm và thu thập kết quả.
+    \item \textbf{Mote Output:} Ghi log chi tiết từng nút, bao gồm
+          bản tin RPL gửi/nhận, thay đổi parent, giá trị Rank và cảnh
+          báo IDS.
+\end{itemize}
+
+\subsubsection{Cấu hình mô phỏng chuẩn}
+
+Bảng~\ref{tab:sim_config} tổng hợp các tham số mô phỏng chung được sử
+dụng nhất quán trong tất cả các kịch bản kiểm thử của đồ án.
+
+\begin{table}[H]
+\centering
+\caption{Tham số cấu hình mô phỏng Cooja}
+\label{tab:sim_config}
+\begin{tabularx}{\textwidth}{lX}
+    \toprule
+    \textbf{Tham số} & \textbf{Giá trị} \\
+    \midrule
+    Công cụ mô phỏng      & Contiki-NG + Cooja Simulator \\
+    Mô hình radio          & UDGM: Distance Loss \\
+    Số nút                 & 20 nút (1 Border Router + 19 mote) \\
+    Phân bố không gian     & Ngẫu nhiên trong vùng 200m $\times$ 200m \\
+    Objective Function     & MRHOF (ETX metric) \\
+    Tần suất gửi dữ liệu  & 1 gói / 10 giây \\
+    Thời gian mô phỏng     & 300 giây / kịch bản \\
+    Tỉ lệ nút tấn công     & 0\%, 10\%, 25\%, 50\% \\
+    Kịch bản đánh giá      & Baseline / Under Attack / With IDS \\
+    \bottomrule
+\end{tabularx}
+\end{table}
+
+% ============================================================
+\subsection{Tóm tắt chương}
+\label{subsec:ch2_summary}
+% ============================================================
+
+Chương này đã trình bày các nền tảng lý thuyết cần thiết cho đồ án, bao
+gồm: (i)~nguyên lý hoạt động của RPL với cấu trúc DODAG, bốn loại bản
+tin điều khiển, cơ chế Trickle Timer và hai Objective Function OF0/MRHOF;
+(ii)~phân loại tấn công RPL theo ba nhóm Resources, Topology và Traffic;
+(iii)~các phương pháp và kiến trúc IDS trong IoT/LLN; (iv)~bộ chỉ số
+đánh giá hiệu năng PDR, E2ED, CO, Power, TPR, FPR; và (v)~môi trường
+mô phỏng Contiki-NG/Cooja.
+
+Các kiến thức này tạo nền tảng để phân tích chi tiết 4 dạng tấn công RPL
+được trình bày trong Chương~3 và thiết kế IDS ở Chương~4.

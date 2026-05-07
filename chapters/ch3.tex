@@ -1,7 +1,398 @@
 % ============================================================
-%  Chapter 3.tex — PHÂN TÍCH CÁC DẠNG TẤN CÔNG RPL
+%  chapters/ch3.tex — Chương 3: Phân tích các dạng tấn công RPL
 % ============================================================
 \section{PHÂN TÍCH CÁC DẠNG TẤN CÔNG RPL}
 \label{sec:ch3}
 
-% TODO: Nội dung chương 3.
+Chương này phân tích chi tiết bốn dạng tấn công RPL được chọn nghiên
+cứu. Với mỗi dạng tấn công, phần trình bày theo cấu trúc thống nhất:
+(1)~cơ chế hoạt động, (2)~tác động đến hiệu năng mạng, (3)~dấu hiệu
+nhận biết và (4)~hướng phòng chống. Cuối chương có bảng so sánh tổng
+hợp bốn kiểu tấn công.
+
+% ============================================================
+\subsection{DIS Flooding Attack}
+\label{subsec:dis_flooding}
+% ============================================================
+
+\subsubsection{Cơ chế tấn công}
+
+DIS Flooding là tấn công thuộc nhóm \textit{Resources -- Direct}, khai
+thác thiết kế của bản tin \textbf{DIS} và cơ chế \textbf{Trickle Timer}
+trong RPL \cite{prajisha2025dis}.
+
+Trong hoạt động bình thường, một nút hợp lệ chỉ gửi DIS khi: (i)~không
+nhận được DIO trong khoảng thời gian quy định (mặc định 60 giây trên
+Contiki-NG), (ii)~nút cha hiện tại bị hỏng, hoặc (iii)~phát hiện routing
+inconsistency. Khi nhận DIS, mọi nút hàng xóm đang là thành viên DODAG
+phải ngay lập tức \textbf{reset Trickle Timer} về $I_{min}$ và phát
+DIO --- thay vì chờ hết chu kỳ hiện tại (có thể lên đến $I_{max}$).
+
+Kẻ tấn công khai thác quy trình này bằng cách phát DIS liên tục với
+tần suất cao (1--2 giây/lần, so với 60 giây bình thường). Kết quả là
+tất cả các nút trong phạm vi thu phát của kẻ tấn công liên tục reset
+Trickle Timer và phát DIO, gây \textbf{bùng nổ bản tin điều khiển}
+trên toàn mạng. Hình~\ref{fig:dis_flooding} minh họa cơ chế này.
+
+\begin{figure}[H]
+    \centering
+    % \includegraphics[width=0.75\textwidth]{Figures/ch3/dis_flooding.png}
+    \caption{Cơ chế DIS Flooding Attack: kẻ tấn công A liên tục phát
+             DIS, buộc các nút lân cận reset Trickle Timer và phát DIO}
+    \label{fig:dis_flooding}
+\end{figure}
+
+\subsubsection{Tác động đến hiệu năng mạng}
+
+DIS Flooding gây ra bốn tác động tiêu cực chính:
+
+\begin{enumerate}
+    \item \textbf{Tăng Control Overhead:} Số bản tin DIO tăng đột biến.
+          Theo \cite{prajisha2025dis}, CO tăng từ 500--550 bản tin (baseline)
+          lên hơn 1200 bản tin trong kịch bản 10 kẻ tấn công.
+
+    \item \textbf{Giảm PDR:} Kênh truyền bị chiếm dụng bởi DIO, gói dữ
+          liệu không được phục vụ kịp thời. PDR giảm từ 97--98\%
+          (baseline) xuống 67--71\% khi bị tấn công.
+
+    \item \textbf{Tăng E2E Delay:} Tắc nghẽn kênh và mất ổn định tô-pô
+          kéo dài thời gian truyền. E2ED tăng từ 99--107\,ms lên tới
+          304\,ms với 10 kẻ tấn công \cite{prajisha2025dis}.
+
+    \item \textbf{Cạn kiệt năng lượng:} Tiêu thụ điện trung bình tăng
+          từ 1.95\,mW lên 3.48\,mW (tăng 78.5\%) khi bị tấn công nặng.
+\end{enumerate}
+
+\subsubsection{Dấu hiệu nhận biết}
+
+\begin{itemize}
+    \item Tần suất nhận DIS từ một nút cụ thể vượt ngưỡng bình thường.
+    \item \textbf{DIS Traffic Load (DTL)} --- tỉ lệ bản tin DIS trên
+          tổng bản tin nhận được --- tăng bất thường:
+          \begin{equation}
+              \text{DTL} = \frac{N_{\text{DIS}}}{N_{\text{total}}}
+              \label{eq:dtl}
+          \end{equation}
+    \item Tần suất thay đổi preferred parent tăng cao (do Trickle Timer
+          reset liên tục làm mạng mất ổn định).
+    \item Tổng số bản tin DIO tăng đột biến trong cửa sổ quan sát.
+\end{itemize}
+
+\subsubsection{Phòng chống}
+
+Giải pháp \textbf{DIS-FDM} \cite{prajisha2025dis} sử dụng Dempster-Shafer
+Theory (DST) kết hợp hai nguồn bằng chứng:
+
+\begin{itemize}
+    \item \textbf{Nguồn chính:} Vi phạm liên tiếp trong thống kê DTL so
+          với ngưỡng động $T\_DTL$.
+    \item \textbf{Nguồn phụ:} Tần suất thay đổi preferred parent bất
+          thường.
+\end{itemize}
+
+Khi tích hợp DIS-FDM: PDR phục hồi lên 87--96\%, E2ED giảm về
+132--173\,ms, tiêu thụ điện giảm xuống 2.28\,mW.
+
+% ============================================================
+\subsection{Blackhole Attack}
+\label{subsec:blackhole}
+% ============================================================
+
+\subsubsection{Cơ chế tấn công}
+
+Blackhole Attack thuộc nhóm \textit{Topology -- Isolation}, là dạng
+tấn công từ chối dịch vụ (DoS) nguy hiểm trong RPL \cite{sharma2022blackhole}.
+
+Tấn công diễn ra theo hai giai đoạn:
+
+\begin{enumerate}
+    \item \textbf{Giai đoạn thu hút (Attraction):} Nút tấn công quảng
+          bá DIO với Rank thấp và/hoặc ETX thấp giả tạo, khiến nhiều nút
+          lân cận chọn nó làm preferred parent. Đây thực chất là kết hợp
+          với Sinkhole Attack.
+
+    \item \textbf{Giai đoạn hủy gói (Dropping):} Sau khi thu hút được
+          lưu lượng, nút tấn công âm thầm loại bỏ \textbf{toàn bộ} gói
+          tin cần chuyển tiếp thay vì gửi đến nút gốc. Các nút nạn nhân
+          không nhận được xác nhận, dẫn đến mất gói hàng loạt.
+\end{enumerate}
+
+Khi vị trí kẻ tấn công được chọn khéo léo (gần nút gốc), nó có thể cô
+lập hoàn toàn một nhánh mạng. Một biến thể nguy hiểm hơn là
+\textbf{Selective Forwarding (Greyhole)}: nút độc hại chỉ hủy một tỉ lệ
+gói (không phải 100\%), khó phát hiện hơn.
+
+\subsubsection{Tác động đến hiệu năng mạng}
+
+\begin{enumerate}
+    \item \textbf{Giảm PDR nghiêm trọng:} Các nút kết nối qua kẻ tấn
+          công có PDR giảm về 0--20\%. Theo \cite{sharma2022blackhole},
+          trong mạng 16 nút lossless, hầu hết nút bị ảnh hưởng nhận
+          PDR dưới 20\% khi không có IDS.
+
+    \item \textbf{Cô lập nút:} Các nút chỉ có đường đi qua kẻ tấn
+          công bị cô lập hoàn toàn khỏi nút gốc.
+
+    \item \textbf{Tăng E2E Delay:} Các nút cố thử lại (retransmit) khi
+          không nhận được ACK, tăng trễ và tiêu tốn năng lượng.
+
+    \item \textbf{Tăng tiêu thụ điện:} Cơ chế retransmission và route
+          repair tự động của RPL tiêu tốn năng lượng thêm.
+\end{enumerate}
+
+\subsubsection{Dấu hiệu nhận biết}
+
+\begin{itemize}
+    \item PDR từ các nút cụ thể giảm đột ngột xuống gần 0.
+    \item Tỉ lệ phản hồi (Response Receipt Rate -- RRR) từ một nút cha
+          giảm mạnh:
+          \begin{equation}
+              \text{RRR} = \frac{N_{\text{response}}}{N_{\text{request}}}
+              \label{eq:rrr}
+          \end{equation}
+    \item Nhiều bản tin DAO không nhận được DAO-ACK từ parent nghi ngờ.
+    \item Số lần route repair tăng cao ở các nút downstream của kẻ tấn công.
+\end{itemize}
+
+\subsubsection{Phòng chống}
+
+Giải pháp \textbf{phân tán dựa trên bộ hẹn giờ} \cite{sharma2022blackhole}:
+Mỗi nút giám sát tỉ lệ phản hồi của parent hiện tại thông qua timer.
+Nếu RRR giảm dưới ngưỡng trong một cửa sổ thời gian, nút đó bị đánh
+dấu nghi ngờ và thông báo tới toàn mạng qua broadcast. Giải pháp này
+đạt TPR lên tới 100\% trên mạng 16 nút lossless.
+
+% ============================================================
+\subsection{Decreased Rank Attack}
+\label{subsec:decreased_rank}
+% ============================================================
+
+\subsubsection{Cơ chế tấn công}
+
+Decreased Rank Attack thuộc nhóm \textit{Topology -- Sub-optimization},
+khai thác cơ chế chọn nút cha dựa trên Rank trong RPL \cite{decrank2022}.
+
+Nút tấn công quảng bá DIO với giá trị \textbf{Rank thấp hơn} Rank thực
+tế của nó (thậm chí gần bằng Rank của nút gốc). Các nút lân cận, theo
+Objective Function, ưu tiên chọn nút có Rank thấp nhất làm preferred
+parent. Hệ quả:
+
+\begin{itemize}
+    \item Nhiều nút cập nhật preferred parent về phía kẻ tấn công.
+    \item Cấu trúc DODAG bị méo: một nhánh cây lớn phụ thuộc vào nút
+          độc hại.
+    \item Kẻ tấn công kiểm soát luồng dữ liệu của các nút nạn nhân,
+          tạo điều kiện thực hiện Blackhole hoặc eavesdropping.
+    \item Với OF0, tấn công đặc biệt hiệu quả vì OF0 không có cơ chế
+          hysteresis --- nút luôn chọn parent có Rank thấp nhất.
+\end{itemize}
+
+Một kết quả quan trọng từ \cite{decrank2022}: tấn công đặt kẻ tấn công
+1--2 hop từ nút gốc có thể \textbf{không gây tác động trực tiếp} nhưng
+làm mất ổn định mạng gián tiếp qua loop, khiến cơ chế IDS dựa trên
+network profiling khó phát hiện.
+
+\subsubsection{Tác động đến hiệu năng mạng}
+
+\begin{enumerate}
+    \item \textbf{Tạo vòng lặp (Routing Loop):} Cấu trúc DODAG không
+          hợp lệ dẫn đến vòng lặp định tuyến, nút phải công bố Rank
+          vô cực để thoát, reset Trickle Timer liên tục.
+
+    \item \textbf{Giảm PDR:} Khi kẻ tấn công kết hợp với Blackhole hoặc
+          khi loop xảy ra, PDR giảm đáng kể. Theo \cite{decrank2022},
+          PDR giảm mạnh hơn khi dùng OF0 so với MRHOF.
+
+    \item \textbf{Tăng tiêu thụ điện:} Các nút liền kề kẻ tấn công có
+          mức tiêu thụ điện tăng bất thường. Ví dụ: nút~10 tăng lên
+          4.12\,mW (OF0) so với baseline 0.98\,mW (Sec-OF).
+
+    \item \textbf{Mất ổn định tô-pô:} Tần suất thay đổi parent tăng,
+          gây overhead không cần thiết.
+\end{enumerate}
+
+\subsubsection{Dấu hiệu nhận biết}
+
+\begin{itemize}
+    \item Nút quảng bá Rank thấp bất thường so với vị trí vật lý ước
+          tính (số hop từ gốc).
+    \item Tần suất thay đổi preferred parent tăng cao ở các nút lân cận.
+    \item Xuất hiện routing inconsistency (nút con có Rank thấp hơn
+          parent).
+    \item Tiêu thụ điện bất thường tập trung tại các nút quanh kẻ
+          tấn công.
+\end{itemize}
+
+\subsubsection{Phòng chống}
+
+\textbf{Secure Objective Function (Sec-OF)} \cite{decrank2022}: Kết hợp
+xác thực Rank dựa trên hop count --- nút chỉ chấp nhận parent nếu
+Rank quảng bá nhất quán với khoảng cách hop thực tế. Đồng thời có thể
+kết hợp VeRA \cite{dvir2011vera} để xác thực cả Rank lẫn Version Number.
+Sec-OF đưa tiêu thụ điện về mức 0.98--1.19\,mW, gần với mức baseline.
+
+% ============================================================
+\subsection{VeRA / DODAG Version Number Attack}
+\label{subsec:vera}
+% ============================================================
+
+\subsubsection{Cơ chế tấn công}
+
+VeRA/DODAG Version Number Attack thuộc nhóm \textit{Resources -- Indirect},
+khai thác cơ chế \textbf{DODAGVersionNumber} trong RPL \cite{dvir2011vera}.
+
+Trong RPL, chỉ nút gốc có quyền tăng DODAGVersionNumber để khởi tạo
+tái cấu trúc tô-pô toàn cục (\textit{global repair}). Khi một nút nhận
+DIO với VersionNumber mới hơn hiện tại, nó:
+(i)~chấp nhận phiên bản mới,
+(ii)~hủy parent set hiện tại,
+(iii)~bắt đầu lại quá trình tham gia DODAG từ đầu,
+(iv)~reset Trickle Timer về $I_{min}$ và phát DIO với version mới.
+
+Kẻ tấn công \textbf{giả mạo nút gốc} bằng cách phát DIO với
+DODAGVersionNumber cao hơn hiện tại. Kết quả: toàn mạng tái cấu trúc
+đồng thời, tiêu tốn lượng lớn năng lượng và băng thông điều khiển. Nếu
+kẻ tấn công lặp lại liên tục, mạng không bao giờ ổn định được.
+
+Kết hợp với tấn công này, kẻ tấn công còn có thể quảng bá Rank thấp
+(Decreased Rank) trong DIO giả, trở thành nút trung gian chiếm lưu lượng
+eavesdrop toàn bộ mạng.
+
+\subsubsection{Tác động đến hiệu năng mạng}
+
+\begin{enumerate}
+    \item \textbf{Tăng Control Overhead đột biến:} Mỗi lần tái cấu trúc
+          toàn cục phát sinh hàng loạt DIO từ tất cả các nút.
+
+    \item \textbf{Gián đoạn dịch vụ:} Trong quá trình tái cấu trúc,
+          các nút chưa thiết lập được parent mới không chuyển tiếp dữ
+          liệu, PDR giảm mạnh.
+
+    \item \textbf{Cạn kiệt pin:} Chi phí năng lượng cho một lần global
+          repair là rất lớn. Tấn công lặp đi lặp lại rút ngắn nghiêm
+          trọng tuổi thọ mạng.
+
+    \item \textbf{Không ổn định tô-pô kéo dài:} Mạng không đạt được
+          trạng thái ổn định, Trickle Timer liên tục ở mức $I_{min}$.
+\end{enumerate}
+
+\subsubsection{Dấu hiệu nhận biết}
+
+\begin{itemize}
+    \item DODAGVersionNumber tăng không được khởi tạo từ nút gốc thực sự.
+    \item Nhiều nút đồng loạt hủy parent và bắt đầu tái cấu trúc trong
+          cùng một khoảng thời gian ngắn.
+    \item Số lượng bản tin DIO tăng đột biến toàn mạng (phân biệt với
+          DIS Flooding: ở đây là DIO tăng, không phải DIS).
+    \item Nút nguồn DIO có VersionNumber bất thường không phải địa
+          chỉ của nút gốc thực sự.
+\end{itemize}
+
+\subsubsection{Phòng chống}
+
+\textbf{VeRA} (Version Number and Rank Authentication) \cite{dvir2011vera}
+sử dụng hai chuỗi hash để xác thực:
+
+\begin{itemize}
+    \item \textbf{Version Number Hash Chain:} Nút gốc tạo chuỗi
+          $V_n, V_{n-1}, \ldots, V_1, V_0$ với $V_n = h(r)$,
+          $V_i = h(V_{i+1})$. Mỗi lần tăng VersionNumber, gốc tiết lộ
+          phần tử tiếp theo trong chuỗi. Nút trung gian xác minh bằng
+          cách kiểm tra $h^i(V_i) = V_0$.
+    \item \textbf{Rank Hash Chain:} Xác thực tính đơn điệu tăng của
+          Rank theo chuỗi từ gốc xuống lá, ngăn Decreased Rank Attack.
+\end{itemize}
+
+Overhead ước tính trên MICAz: HMAC-SHA-1 tốn 5.6\,ms, toàn bộ VNA
+(Version Number Authentication) tốn 2040\,ms ở gốc và 7650\,ms ở nút
+trung gian \cite{dvir2011vera} --- chấp nhận được cho LLN.
+
+% ============================================================
+\subsection{So sánh tổng hợp bốn kiểu tấn công}
+\label{subsec:attack_comparison}
+% ============================================================
+
+Bảng~\ref{tab:attack_comparison} tổng hợp so sánh bốn kiểu tấn công
+theo các tiêu chí chính, giúp định hướng cho thiết kế IDS ở Chương~4.
+
+\begin{table}[H]
+\centering
+\caption{So sánh bốn kiểu tấn công RPL được nghiên cứu}
+\label{tab:attack_comparison}
+\begin{tabularx}{\textwidth}{L{0.7} C{0.6} C{0.6} C{0.6} C{0.6}}
+    \toprule
+    \textbf{Tiêu chí}
+        & \textbf{DIS Flooding}
+        & \textbf{Blackhole}
+        & \textbf{Decreased Rank}
+        & \textbf{VeRA / Version} \\
+    \midrule
+    Nhóm tấn công
+        & Resources
+        & Topology
+        & Topology
+        & Resources \\
+    Kiểu
+        & Direct
+        & Isolation
+        & Sub-optim.
+        & Indirect \\
+    Bản tin khai thác
+        & DIS
+        & DIO + drop
+        & DIO (Rank)
+        & DIO (Version) \\
+    Ảnh hưởng PDR
+        & Trung bình
+        & Nghiêm trọng
+        & Trung bình
+        & Trung bình \\
+    Ảnh hưởng năng lượng
+        & Cao
+        & Cao
+        & Cao
+        & Rất cao \\
+    Khó phát hiện
+        & Thấp
+        & Trung bình
+        & Cao
+        & Trung bình \\
+    Chỉ số phát hiện chính
+        & DTL, DIO rate
+        & PDR, RRR
+        & Rank, parent change
+        & VersionNumber \\
+    Giải pháp phòng chống
+        & DIS-FDM
+        & Timer-based
+        & Sec-OF
+        & VeRA \\
+    \bottomrule
+\end{tabularx}
+\end{table}
+
+% ============================================================
+\subsection{Tóm tắt chương}
+\label{subsec:ch3_summary}
+% ============================================================
+
+Chương này đã phân tích chi tiết bốn dạng tấn công RPL: DIS Flooding
+Attack, Blackhole Attack, Decreased Rank Attack và VeRA/Version Number
+Attack. Mỗi kiểu tấn công có cơ chế khai thác khác nhau, tác động đến
+các chỉ số hiệu năng theo mức độ và chiều hướng riêng biệt. Đặc biệt:
+
+\begin{itemize}
+    \item \textbf{DIS Flooding} tăng Control Overhead và giảm PDR thông
+          qua việc bão hòa kênh điều khiển.
+    \item \textbf{Blackhole} là tấn công nguy hiểm nhất về mặt mất dữ
+          liệu, có thể đưa PDR của nút nạn nhân về 0.
+    \item \textbf{Decreased Rank} gây mất ổn định tô-pô kéo dài và có
+          thể kết hợp với các tấn công khác, đặc biệt khó phát hiện khi
+          đặt kẻ tấn công xa nút gốc.
+    \item \textbf{VeRA/Version Attack} gây tốn kém năng lượng nhất vì
+          kích hoạt tái cấu trúc tô-pô toàn cục lặp đi lặp lại.
+\end{itemize}
+
+Hiểu biết về dấu hiệu nhận biết của từng kiểu tấn công sẽ là cơ sở
+trực tiếp để thiết kế các module phát hiện trong IDS được trình bày
+ở Chương~4.
