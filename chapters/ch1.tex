@@ -1,0 +1,240 @@
+% ============================================================
+%  chapters/ch1.tex — Chương 1: Giới thiệu và tổng quan
+% ============================================================
+\section{GIỚI THIỆU VÀ TỔNG QUAN}
+\label{sec:ch1}
+
+% ============================================================
+\subsection{Bối cảnh và động lực nghiên cứu}
+\label{subsec:context}
+% ============================================================
+
+Trong những thập kỷ gần đây, \textit{Internet of Things} (IoT) đã trở thành
+một trong những xu hướng công nghệ phát triển nhanh nhất, kết nối hàng tỷ
+thiết bị thông minh trong các lĩnh vực từ nhà thông minh, y tế, nông nghiệp
+chính xác đến hệ thống công nghiệp và thành phố thông minh \cite{prajisha2025dis}.
+Theo dự báo của các tổ chức nghiên cứu công nghệ, số lượng thiết bị IoT được
+kết nối trên toàn cầu sẽ vượt mốc 30 tỷ thiết bị vào năm 2030, tạo nên một
+hạ tầng mạng lưới phức tạp và phân tán chưa từng có trong lịch sử.
+
+Nền tảng vật lý của hạ tầng IoT chủ yếu dựa trên các \textit{Mạng năng lượng
+thấp và mất mát cao} (Low-power and Lossy Networks -- LLN). Đây là các mạng
+không dây bao gồm hàng nghìn nút cảm biến bị giới hạn nghiêm ngặt về bộ nhớ,
+khả năng xử lý và nguồn năng lượng pin \cite{prajisha2025dis}. Các nút trong
+LLN thường được triển khai trong những môi trường khắc nghiệt nơi việc thay
+thế pin là không khả thi, đòi hỏi giao thức mạng phải cực kỳ tiết kiệm tài
+nguyên.
+
+Để giải quyết bài toán định tuyến hiệu quả trong môi trường ràng buộc này,
+Tổ chức Kỹ thuật Internet (IETF), thông qua nhóm làm việc ROLL
+(\textit{Routing Over Low-power and Lossy Networks}), đã chuẩn hóa \textbf{RPL}
+(\textit{IPv6 Routing Protocol for Low-Power and Lossy Networks}) theo
+RFC~6550 vào năm 2012 \cite{winter2012rpl}. RPL nhanh chóng trở thành
+giao thức định tuyến tiêu chuẩn \textit{de facto} cho IoT/LLN nhờ thiết kế
+nhẹ nhàng, hỗ trợ đa dạng mô hình truyền thông (nhiều-đến-một,
+một-đến-nhiều, điểm-đến-điểm) và khả năng tự tổ chức tô-pô thích ứng.
+
+Tuy nhiên, chính sự đơn giản và phổ biến của RPL lại tạo ra bề mặt tấn công
+đáng lo ngại. Các nghiên cứu gần đây đã chỉ ra rằng RPL rất dễ bị tổn thương
+trước nhiều dạng tấn công khác nhau, gây ra các hậu quả nghiêm trọng như:
+tăng tiêu thụ năng lượng, định tuyến gói sai hướng, tắc nghẽn mạng và cô lập
+các nút hợp lệ \cite{prajisha2025dis}. Đặc biệt nguy hiểm là các cuộc tấn
+công từ \textit{nút nội bộ bị xâm phạm} (compromised internal node) ---
+loại tấn công mà ngay cả cơ chế mật mã tùy chọn của RPL cũng không bảo vệ
+được \cite{dvir2011vera}.
+
+Trong bối cảnh đó, nhu cầu xây dựng \textbf{Hệ thống Phát hiện Xâm nhập}
+(Intrusion Detection System -- IDS) chuyên biệt cho mạng RPL ngày càng trở
+nên cấp thiết, đặc biệt khi các ứng dụng IoT trong y tế, cơ sở hạ tầng
+trọng yếu và quân sự yêu cầu mức độ tin cậy và an toàn cao.
+
+% ============================================================
+\subsection{Vấn đề nghiên cứu}
+\label{subsec:problem}
+% ============================================================
+
+RPL xây dựng và duy trì một đồ thị acyclic có hướng tập trung vào đích
+(\textit{Destination Oriented Directed Acyclic Graph} -- DODAG) thông qua
+ba loại thông điệp điều khiển chính: \texttt{DIO} (DODAG Information Object),
+\texttt{DIS} (DODAG Information Solicitation) và \texttt{DAO}
+(Destination Advertisement Object). Thiết kế tin tưởng ngầm định vào tính
+trung thực của các nút tham gia mạng, điều này hoàn toàn có thể bị khai thác
+bởi các nút độc hại.
+
+Theo phân loại trong \cite{overview_rpl_framework}, các tấn công vào RPL
+thuộc ba nhóm chính:
+
+\begin{enumerate}
+    \item \textbf{Tấn công cạn kiệt tài nguyên (Resources):} Nút độc hại
+          buộc các nút hợp lệ thực hiện những hành động không cần thiết,
+          làm tăng tiêu thụ năng lượng, bộ nhớ và băng thông. Nhóm này
+          bao gồm tấn công trực tiếp (direct) như DIS Flooding, và gián
+          tiếp (indirect) như Version Number Attack.
+
+    \item \textbf{Tấn công phá vỡ tô-pô (Topology):} Nút độc hại làm méo
+          cấu trúc DODAG, khiến mạng hội tụ về trạng thái không tối ưu
+          (sub-optimization) hoặc cô lập một số nút (isolation). Nhóm
+          này bao gồm Decreased Rank Attack và Blackhole Attack.
+
+    \item \textbf{Tấn công lưu lượng (Traffic):} Nút độc hại len lỏi vào
+          mạng để nghe trộm (eavesdropping) hoặc giả mạo
+          (misappropriation) lưu lượng dữ liệu hợp lệ.
+\end{enumerate}
+
+Đồ án tập trung vào \textbf{bốn dạng tấn công} tiêu biểu và nguy hiểm nhất,
+có đầy đủ tài liệu nghiên cứu và có thể mô phỏng kiểm thử trên Cooja:
+
+\begin{enumerate}
+    \item \textbf{DIS Flooding Attack} \textit{[Resources -- Direct]}:
+          Kẻ tấn công liên tục phát tán bản tin DIS vào mạng, buộc tất cả
+          các nút lân cận phải reset bộ hẹn giờ Trickle và phản hồi bằng
+          bản tin DIO, dẫn đến bùng nổ lưu lượng điều khiển và cạn kiệt
+          năng lượng pin \cite{prajisha2025dis}.
+
+    \item \textbf{Blackhole Attack} \textit{[Topology -- Isolation]}:
+          Nút tấn công quảng bá các thông số định tuyến hấp dẫn để thu
+          hút lưu lượng về phía mình, sau đó lặng lẽ hủy toàn bộ gói tin
+          thay vì chuyển tiếp, gây mất gói diện rộng và có thể cô lập
+          các nhánh mạng khỏi nút gốc \cite{sharma2022blackhole}.
+
+    \item \textbf{Decreased Rank Attack} \textit{[Topology --
+          Sub-optimization]}: Nút tấn công quảng bá giá trị Rank thấp hơn
+          thực tế để lôi kéo các nút lân cận chọn nó làm nút cha ưu tiên,
+          từ đó kiểm soát luồng dữ liệu và làm méo cấu trúc DODAG
+          \cite{decrank2022}.
+
+    \item \textbf{VeRA / DODAG Version Number Attack} \textit{[Resources
+          -- Indirect]}: Kẻ tấn công tăng số phiên bản DODAG bất hợp
+          pháp, buộc toàn bộ mạng tái cấu trúc định tuyến toàn cục
+          (global repair), tiêu tốn lượng lớn năng lượng và băng thông
+          điều khiển \cite{dvir2011vera}.
+\end{enumerate}
+
+Mặc dù đã có các nghiên cứu đề xuất giải pháp phòng chống từng dạng tấn
+công riêng lẻ, việc xây dựng một IDS thống nhất có khả năng phát hiện đồng
+thời nhiều kiểu tấn công trên thiết bị cực kỳ hạn chế tài nguyên vẫn là
+một thách thức mở.
+
+% ============================================================
+\subsection{Mục tiêu đề tài}
+\label{subsec:objectives}
+% ============================================================
+
+Đồ án hướng tới năm mục tiêu cụ thể sau:
+
+\begin{enumerate}
+    \item[\textbf{M1.}] \textbf{Nghiên cứu lý thuyết:} Nắm vững nguyên
+          lý hoạt động của RPL (DODAG, Trickle Timer, Objective Function,
+          DIO/DIS/DAO), phân loại tấn công và các khái niệm nền tảng của
+          IDS trong môi trường IoT/LLN.
+
+    \item[\textbf{M2.}] \textbf{Phân tích tấn công:} Hiểu sâu cơ chế,
+          tác động đến hiệu năng mạng và dấu hiệu nhận biết của 4 dạng
+          tấn công RPL được chọn thông qua tài liệu và mô phỏng thực nghiệm.
+
+    \item[\textbf{M3.}] \textbf{Thiết kế IDS:} Đề xuất kiến trúc IDS phù
+          hợp với ràng buộc tài nguyên của LLN, tích hợp module phát hiện
+          độc lập cho từng kiểu tấn công mà không cần sửa đổi nhân RPL.
+
+    \item[\textbf{M4.}] \textbf{Triển khai và kiểm thử:} Cài đặt IDS
+          trên Contiki-NG và mô phỏng trên Cooja theo ba trạng thái:
+          baseline (bình thường), đang bị tấn công và có IDS bảo vệ.
+
+    \item[\textbf{M5.}] \textbf{Đánh giá định lượng:} So sánh các chỉ số
+          PDR, End-to-End Delay, Control Overhead, Power Consumption,
+          Detection Rate (TPR) và False Positive Rate (FPR) trước và sau
+          khi triển khai IDS.
+\end{enumerate}
+
+% ============================================================
+\subsection{Phạm vi nghiên cứu}
+\label{subsec:scope}
+% ============================================================
+
+Để đảm bảo tính khả thi trong khuôn khổ đồ án môn học, phạm vi được giới
+hạn cụ thể như sau:
+
+\begin{itemize}
+    \item \textbf{Giao thức:} Chỉ nghiên cứu RPL (RFC~6550). Không bao
+          gồm các giao thức LLN khác như OSPF, IS-IS hay AODV.
+
+    \item \textbf{Mô hình kẻ tấn công:} Giả định tấn công từ \textit{nút
+          nội bộ bị xâm phạm} (compromised internal node). Đây là mô
+          hình nguy hiểm nhất vì kẻ tấn công đã vượt qua cơ chế mật mã
+          mặc định của RPL, có khả năng gửi bản tin hợp lệ về cú pháp
+          nhưng mang nội dung độc hại.
+
+    \item \textbf{Môi trường:} Mô phỏng trên Contiki-NG và Cooja
+          Simulator. Không triển khai trên phần cứng thực tế.
+
+    \item \textbf{Phương pháp IDS:} Tập trung vào anomaly-based và
+          threshold-based detection. Không đi sâu vào học máy hoặc
+          học sâu.
+
+    \item \textbf{Quy mô mô phỏng:} Mạng tĩnh từ 10 đến 30 nút, tỉ lệ
+          nút tấn công từ 0\% đến 50\%, thời gian mô phỏng 300 giây
+          mỗi kịch bản.
+\end{itemize}
+
+% ============================================================
+\subsection{Đóng góp của đề tài}
+\label{subsec:contribution}
+% ============================================================
+
+So với các nghiên cứu liên quan, đồ án có bốn đóng góp chính:
+
+\begin{enumerate}
+    \item \textbf{Khung phân tích thống nhất:} Tổng hợp và phân tích chi
+          tiết 4 dạng tấn công RPL trong một khung đánh giá nhất quán với
+          cùng bộ chỉ số hiệu năng, cho phép so sánh trực tiếp mức độ
+          nguy hại của từng kiểu tấn công.
+
+    \item \textbf{Kiến trúc IDS tích hợp:} Đề xuất IDS có khả năng phát
+          hiện đồng thời nhiều kiểu tấn công mà không yêu cầu sửa đổi
+          nhân RPL, đảm bảo tương thích với các triển khai Contiki-NG
+          hiện có.
+
+    \item \textbf{Bộ kịch bản kiểm thử chuẩn hóa:} Cung cấp bộ kịch
+          bản Cooja có thể tái lập (reproducible), giúp cộng đồng nghiên
+          cứu dễ dàng so sánh và mở rộng.
+
+    \item \textbf{Phân tích đánh đổi tài nguyên:} Làm rõ sự đánh đổi
+          (trade-off) giữa độ chính xác phát hiện và chi phí tài nguyên
+          phát sinh bởi IDS trên các nút cảm biến hạn chế.
+\end{enumerate}
+
+% ============================================================
+\subsection{Cấu trúc báo cáo}
+\label{subsec:structure}
+% ============================================================
+
+Báo cáo được tổ chức thành 6 chương như sau:
+
+\begin{itemize}
+    \item \textbf{Chương 1 -- Giới thiệu và tổng quan} (chương hiện tại):
+          Trình bày bối cảnh, vấn đề nghiên cứu, mục tiêu, phạm vi và
+          cấu trúc báo cáo.
+
+    \item \textbf{Chương 2 -- Cơ sở lý thuyết:} Giới thiệu chi tiết giao
+          thức RPL, phân loại tấn công theo taxonomy, tổng quan về IDS
+          trong IoT, các chỉ số đánh giá hiệu năng và môi trường
+          Contiki-NG/Cooja.
+
+    \item \textbf{Chương 3 -- Phân tích các dạng tấn công RPL:} Mô tả
+          chi tiết cơ chế, tác động và dấu hiệu nhận biết của 4 kiểu
+          tấn công, kèm kết quả mô phỏng so sánh với baseline.
+
+    \item \textbf{Chương 4 -- Thiết kế IDS phát hiện tấn công RPL:}
+          Khảo sát related work, đề xuất kiến trúc IDS và trình bày
+          các module phát hiện/phòng chống tương ứng.
+
+    \item \textbf{Chương 5 -- Demo và kiểm thử:} Trình bày môi trường
+          thực nghiệm, kịch bản kiểm thử, kết quả đo lường (PDR, E2ED,
+          overhead, power) và đánh giá IDS (TPR, FPR).
+
+    \item \textbf{Chương 6 -- Kết luận và hướng phát triển:} Tóm tắt
+          kết quả, hạn chế và các hướng nghiên cứu tiếp theo.
+\end{itemize}
+
+Ngoài ra, báo cáo bao gồm \textbf{Phụ lục} với mã nguồn IDS
+(Contiki-NG), script mô phỏng Cooja và danh mục chữ viết tắt.

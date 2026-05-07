@@ -1,0 +1,68 @@
+% ============================================================
+%  Abstract.tex — Tóm tắt (Tiếng Việt + Tiếng Anh)
+% ============================================================
+\section*{TÓM TẮT}
+\phantomsection
+\addcontentsline{toc}{section}{\numberline{}TÓM TẮT}
+\thispagestyle{empty}
+
+Giao thức định tuyến \textbf{RPL} (IPv6 Routing Protocol for Low-Power and
+Lossy Networks, RFC~6550) là chuẩn định tuyến chủ đạo trong các mạng IoT
+năng lượng thấp (LLN). Tuy nhiên, thiết kế nhẹ nhàng của RPL tạo ra bề mặt
+tấn công rộng mà các cơ chế bảo mật mặc định của giao thức chưa bảo vệ
+được đầy đủ, đặc biệt khi đối mặt với các nút nội bộ bị xâm phạm.
+
+Đồ án này trình bày quá trình nghiên cứu, phân tích và xây dựng \textbf{Hệ
+thống Phát hiện Xâm nhập} (IDS) cho mạng RPL. Bốn dạng tấn công tiêu biểu
+được tập trung nghiên cứu gồm: \textit{DIS Flooding Attack},
+\textit{Blackhole Attack}, \textit{Decreased Rank Attack} và
+\textit{VeRA/DODAG Version Number Attack}. Với mỗi dạng tấn công, báo cáo
+phân tích cơ chế hoạt động, tác động đến hiệu năng mạng và phương pháp phát
+hiện tương ứng.
+
+Kiến trúc IDS đề xuất được tích hợp trực tiếp vào ngăn xếp Contiki-NG,
+không yêu cầu sửa đổi nhân giao thức RPL. Hệ thống được kiểm thử trên bộ
+mô phỏng Cooja với nhiều kịch bản khác nhau. Kết quả thực nghiệm cho thấy
+IDS đề xuất đạt tỉ lệ phát hiện cao (TPR $\geq$ 90\%) với tỉ lệ cảnh báo
+nhầm thấp (FPR $\leq$ 10\%), đồng thời duy trì overhead tài nguyên ở mức
+chấp nhận được trên các nút cảm biến hạn chế.
+
+\vspace{0.5cm}
+\noindent\textbf{Từ khóa:} RPL, IDS, IoT, LLN, DIS Flooding, Blackhole,
+Decreased Rank, VeRA, Contiki-NG, Cooja, phát hiện xâm nhập.
+
+\vspace{1.5cm}
+\begin{center}
+  \rule{0.5\textwidth}{0.4pt}
+\end{center}
+\vspace{1cm}
+
+\section*{ABSTRACT}
+\phantomsection
+\addcontentsline{toc}{section}{\numberline{}ABSTRACT}
+
+The \textbf{RPL} protocol (IPv6 Routing Protocol for Low-Power and Lossy
+Networks, RFC~6550) is the de-facto routing standard for IoT and LLN
+environments. However, its lightweight design introduces a wide attack surface
+that default RPL security mechanisms cannot adequately protect against,
+especially when facing compromised internal nodes.
+
+This report presents the research, analysis, and design of an \textbf{Intrusion
+Detection System} (IDS) for RPL networks. Four representative attack types are
+studied in depth: \textit{DIS Flooding Attack}, \textit{Blackhole Attack},
+\textit{Decreased Rank Attack}, and \textit{VeRA/DODAG Version Number Attack}.
+For each attack, the report analyzes the mechanism, impact on network
+performance, and the corresponding detection method.
+
+The proposed IDS architecture is integrated directly into the Contiki-NG stack
+without modifying the RPL protocol core. The system is evaluated on the Cooja
+Simulator under multiple scenarios. Experimental results show that the proposed
+IDS achieves high detection rates (TPR $\geq$ 90\%) with low false positive
+rates (FPR $\leq$ 10\%), while maintaining acceptable resource overhead on
+constrained sensor nodes.
+
+\vspace{0.5cm}
+\noindent\textbf{Keywords:} RPL, IDS, IoT, LLN, DIS Flooding, Blackhole,
+Decreased Rank, VeRA, Contiki-NG, Cooja, intrusion detection.
+
+\cleardoublepage

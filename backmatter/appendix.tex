@@ -1,0 +1,117 @@
+% ============================================================
+%  Appendix.tex — Phụ lục
+% ============================================================
+\section*{PHỤ LỤC}
+\phantomsection
+\addcontentsline{toc}{section}{\numberline{}PHỤ LỤC}
+\setcounter{section}{0}
+\renewcommand{\thesection}{\Alph{section}}
+
+% ============================================================
+\section{Mã nguồn IDS (Contiki-NG)}
+\label{app:code}
+% ============================================================
+
+\subsection{Module phát hiện DIS Flooding}
+
+% TODO: dán mã nguồn C vào đây, ví dụ:
+% \lstinputlisting[language=C,
+%   caption={ids\_dis\_flooding.c}]{Code/ids_dis_flooding.c}
+
+\begin{lstlisting}[language=C, caption={Skeleton: ids\_dis\_flooding.c}]
+#include "contiki.h"
+#include "net/routing/rpl-lite/rpl.h"
+
+/* Nguong so ban tin DIS trong mot chu ky Trickle */
+#define DIS_FLOOD_THRESHOLD  10
+
+static uint16_t dis_count = 0;
+
+void ids_dis_on_receive(void) {
+  dis_count++;
+  if (dis_count > DIS_FLOOD_THRESHOLD) {
+    /* TODO: Kich hoat canh bao DIS Flooding */
+  }
+}
+\end{lstlisting}
+
+\subsection{Module phát hiện Blackhole}
+
+\begin{lstlisting}[language=C, caption={Skeleton: ids\_blackhole.c}]
+#include "contiki.h"
+
+#define PDR_THRESHOLD  0.7   /* PDR duoi 70% -> nghi ngo Blackhole */
+
+float ids_compute_pdr(uint16_t sent, uint16_t received) {
+  if (sent == 0) return 1.0f;
+  return (float)received / (float)sent;
+}
+\end{lstlisting}
+
+\subsection{Module phát hiện Decreased Rank}
+
+\begin{lstlisting}[language=C, caption={Skeleton: ids\_decreased\_rank.c}]
+#include "contiki.h"
+#include "net/routing/rpl-lite/rpl.h"
+
+void ids_rank_check(rpl_dag_t *dag, rpl_parent_t *parent,
+                    rpl_rank_t advertised_rank) {
+  rpl_rank_t expected = /* tinh toan rank du kien */ 0;
+  if (advertised_rank < expected) {
+    /* TODO: Danh dau parent nay la nghi ngo */
+  }
+}
+\end{lstlisting}
+
+\subsection{Module phát hiện VeRA / Version Number Attack}
+
+\begin{lstlisting}[language=C, caption={Skeleton: ids\_vera.c}]
+#include "contiki.h"
+#include "net/routing/rpl-lite/rpl.h"
+
+static uint8_t last_known_version = 0;
+
+void ids_version_check(uint8_t received_version) {
+  if (received_version > last_known_version + 1) {
+    /* TODO: Version tang bat thuong -> canh bao VeRA attack */
+  }
+  last_known_version = received_version;
+}
+\end{lstlisting}
+
+% ============================================================
+\section{Cấu hình mô phỏng Cooja}
+\label{app:cooja}
+% ============================================================
+
+\subsection{Tham số mô phỏng}
+
+\begin{table}[H]
+\centering
+\caption{Tham số cấu hình chung trong Cooja}
+\begin{tabularx}{\textwidth}{lX}
+  \toprule
+  \textbf{Tham số} & \textbf{Giá trị} \\
+  \midrule
+  Mô phỏng radio    & Unit Disk Graph Medium (UDGM) \\
+  Số nút tổng       & 20 nút (1 Border Router + 19 mote) \\
+  Tỉ lệ nút tấn công & 0\%, 10\%, 25\%, 50\% \\
+  Thời gian mô phỏng & 300 giây / kịch bản \\
+  Tần suất gửi dữ liệu & 1 gói / 10 giây \\
+  Hệ điều hành      & Contiki-NG 4.x \\
+  Objective Function & MRHOF (ETX metric) \\
+  \bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Hướng dẫn chạy mô phỏng}
+
+\begin{enumerate}
+  \item Cài đặt Contiki-NG và Cooja theo hướng dẫn tại
+        \url{https://github.com/contiki-ng/contiki-ng/wiki}.
+  \item Mở file \texttt{simulation/rpl\_ids\_scenario.csc} trong Cooja.
+  \item Chọn kịch bản tấn công trong menu \textbf{Simulation Parameters}.
+  \item Nhấn \textbf{Start} và quan sát log từ \textbf{Mote Output}.
+  \item Xuất kết quả ra file \texttt{.csv} để phân tích với script Python
+        trong thư mục \texttt{analysis/}.
+\end{enumerate}

@@ -1,0 +1,204 @@
+% ============================================================
+%  main.tex — Đồ án môn học: Xây dựng IDS phát hiện tấn công RPL
+%  Template adapted from BKIC-611 lab, HUST
+% ============================================================
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T5]{fontenc}
+\usepackage[fontsize=13pt]{scrextend}
+\usepackage[paperheight=29.7cm,paperwidth=21cm,
+            right=2cm,left=3cm,top=2cm,bottom=2.5cm,twoside]{geometry}
+
+% ----- Font -----
+\usepackage{mathptmx}
+
+% ----- Hình ảnh & vẽ -----
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{calc, shapes.geometric, arrows.meta, positioning, fit}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+
+% ----- Giãn dòng & thụt lề -----
+\usepackage{indentfirst}
+\renewcommand{\baselinestretch}{1.2}
+\setlength{\parskip}{6pt}
+\setlength{\parindent}{1cm}
+
+% ----- Tiêu đề section -----
+\usepackage{titlesec}
+\setcounter{secnumdepth}{4}
+
+\titlespacing*{\section}{0pt}{0pt}{30pt}
+\titleformat*{\section}
+  {\fontsize{16pt}{19.2pt}\selectfont\bfseries\centering}
+
+\titlespacing*{\subsection}{0pt}{10pt}{0pt}
+\titleformat*{\subsection}
+  {\fontsize{14pt}{16.8pt}\selectfont\bfseries}
+
+\titlespacing*{\subsubsection}{0pt}{10pt}{0pt}
+\titleformat*{\subsubsection}
+  {\fontsize{13pt}{15.6pt}\selectfont\bfseries\itshape}
+
+\titlespacing*{\paragraph}{0pt}{10pt}{0pt}
+\titleformat*{\paragraph}
+  {\fontsize{13pt}{15.6pt}\selectfont\itshape}
+
+% ----- Caption hình & bảng -----
+\renewcommand{\figurename}{\fontsize{12pt}{0pt}\selectfont\bfseries Hình}
+\renewcommand{\thefigure}{\thesection.\arabic{figure}}
+\usepackage[font=bf]{caption}
+\captionsetup[figure]{labelsep=space}
+
+\renewcommand{\tablename}{\fontsize{12pt}{0pt}\selectfont\bfseries Bảng}
+\renewcommand{\thetable}{\thesection.\arabic{table}}
+\captionsetup[table]{labelsep=space}
+
+% ----- Bảng biểu -----
+\usepackage{multicol, multirow, tabularx, booktabs, longtable}
+\newcolumntype{C}[1]{>{\hsize=#1\hsize\centering\arraybackslash}X}
+\newcolumntype{R}[1]{>{\hsize=#1\hsize\raggedleft\arraybackslash}X}
+\newcolumntype{L}[1]{>{\hsize=#1\hsize\raggedright\arraybackslash}X}
+\renewcommand{\tabularxcolumn}[1]{>{\small}m{#1}}
+\usepackage{colortbl}
+\definecolor{LightCyan}{rgb}{0.88,1,1}
+
+% ----- Toán học -----
+\usepackage{amsmath, amssymb, amsthm}
+\renewcommand{\theequation}{\thesection.\arabic{equation}}
+\newtheorem{theorem}{Định lý}[section]
+\newtheorem{defn}[theorem]{Định nghĩa}
+\newtheorem{lemma}[theorem]{Bổ đề}
+
+% ----- Listings (code) -----
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codebg}{RGB}{248,248,248}
+\definecolor{codecomment}{RGB}{100,100,100}
+\lstset{
+  backgroundcolor  = \color{codebg},
+  frame            = single,
+  framerule        = 0.4pt,
+  basicstyle       = \ttfamily\small,
+  keywordstyle     = \color{blue}\bfseries,
+  commentstyle     = \color{codecomment}\itshape,
+  stringstyle      = \color{teal},
+  breaklines       = true,
+  numbers          = left,
+  numberstyle      = \tiny\color{gray},
+  numbersep        = 8pt,
+  captionpos       = b,
+  showstringspaces = false,
+  tabsize          = 2
+}
+
+% ----- Thuật toán -----
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+% ----- Danh sách -----
+\usepackage{enumitem}
+
+% ----- Các gói tiện ích -----
+\usepackage{forloop}
+\newcounter{loopcntr}
+\newcommand{\rpt}[2][1]{\forloop{loopcntr}{0}{\value{loopcntr}<#1}{#2}}
+\usepackage[ddmmyyyy]{datetime}
+\usepackage{nameref}
+\usepackage{rotating}
+\usepackage{bm}
+\DeclareRobustCommand{\vect}[1]{\bm{#1}}
+% ----- Tên mục lục (tiếng Việt) -----
+\renewcommand{\contentsname}{MỤC LỤC}
+\renewcommand{\listfigurename}{DANH MỤC HÌNH ẢNH}
+\renewcommand{\listtablename}{DANH MỤC BẢNG BIỂU}
+\renewcommand{\refname}{TÀI LIỆU THAM KHẢO}
+
+% ----- Hyperlink -----
+\usepackage[unicode]{hyperref}
+\pdfstringdefDisableCommands{\renewcommand{\vect}[1]{#1}}
+\hypersetup{
+  colorlinks = true,
+  linkcolor  = blue!60!black,
+  citecolor  = blue!60!black,
+  urlcolor   = blue!60!black,
+  pdftitle   = {Xây dựng IDS phát hiện tấn công RPL},
+  pdfauthor  = {Nguyen Van A}
+}
+
+% ============================================================
+\begin{document}
+
+% ---------- Trang bìa ----------
+\input{frontmatter/cover}
+
+% ---------- Phiếu giao đề tài ----------
+% \input{frontmatter/assignment}
+
+% ---------- Lời nói đầu ----------
+\input{frontmatter/preface}
+
+% ---------- Lời cam đoan ----------
+\input{frontmatter/pledge}
+
+% ---------- Mục lục ----------
+\addtocontents{toc}{\protect\thispagestyle{empty}}
+\tableofcontents
+\thispagestyle{empty}
+\cleardoublepage
+
+% ---------- Danh mục chữ viết tắt ----------
+\input{frontmatter/abbreviations}
+
+% ---------- Danh mục hình ảnh ----------
+{\let\oldnumberline\numberline
+\renewcommand{\numberline}{Hình~\oldnumberline}
+\listoffigures}
+\phantomsection
+\addcontentsline{toc}{section}{\numberline{}DANH MỤC HÌNH ẢNH}
+\newpage
+
+% ---------- Danh mục bảng biểu ----------
+{\let\oldnumberline\numberline
+\renewcommand{\numberline}{Bảng~\oldnumberline}
+\listoftables}
+\phantomsection
+\addcontentsline{toc}{section}{\numberline{}DANH MỤC BẢNG BIỂU}
+\newpage
+
+% ---------- Tóm tắt ----------
+\input{frontmatter/abstract}
+
+% ---------- Phân công nhiệm vụ ----------
+% \input{Duty roster}   % Bỏ comment nếu làm nhóm
+
+% ---------- Nội dung chính ----------
+\pagenumbering{arabic}
+
+\input{chapters/ch1}
+\newpage
+\input{chapters/ch2}
+\newpage
+\input{chapters/ch3}
+\newpage
+\input{chapters/ch4}
+\newpage
+\input{chapters/ch5}
+\newpage
+\input{chapters/ch6}
+\newpage
+
+% ---------- Tài liệu tham khảo ----------
+\phantomsection
+\addcontentsline{toc}{section}{\numberline{}TÀI LIỆU THAM KHẢO}
+\nocite{*}
+\bibliographystyle{IEEEtran}
+\bibliography{References}
+
+% ---------- Phụ lục ----------
+\newpage
+\input{backmatter/appendix}
+
+\end{document}
