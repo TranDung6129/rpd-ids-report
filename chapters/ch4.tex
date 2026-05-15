@@ -61,7 +61,8 @@ PROCESS_THREAD(udp_client_process, ev, data)
 }
 \end{verbatim}
 
-Phần đặt lại giá trị DTL (đoạn mã \ref{code:dis-prevention-process}) sẽ được thực hiện định kỳ sau mỗi 5 giây để đảm bảo hệ thống có thể tiếp tục hoạt động bình thường sau khi đã từ chối một số lượng gói tin DIS nhất định. Phần này được triển khai dưới dạng một tiến trình riêng biệt khỏi tiến trình chính của node.
+Phần đặt lại giá trị DTL (đoạn mã \ref{code:dis-prevention-process}) sẽ được thực hiện định kỳ sau mỗi 5 giây để đảm bảo hệ thống có thể tiếp tục hoạt động bình thường sau khi đã từ chối một số lượng gói tin DIS nhất định. Phần này được triển khai dưới dạng một tiến trình riêng biệt khỏi tiến trình chính của node. \texttt{etimer\_set(\&periodic\_timer, CLOCK\_SECOND * 5);} được sử dụng để thiết lập bộ đếm thời gian, và \\
+\texttt{PROCESS\_WAIT\_EVENT\_UNTIL(etimer\_expired(\&periodic\_timer));} sẽ chờ cho đến khi bộ đếm thời gian hết hạn trước khi thực hiện việc đặt lại giá trị DTL.
 
 \phantomsection\label{code:dis-prevention-process}
 \begin{verbatim}
