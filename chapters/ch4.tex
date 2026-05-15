@@ -7,6 +7,8 @@
 Chương này trình bày thiết kế và triển khai hệ thống IDS phát hiện tấn công RPL. Hệ thống được xây dựng dựa trên việc phân tích gói tin và so sánh với quy tắc nhằm phát hiện bất thường trong giao thức RPL. Hệ thống được triển khai trực tiếp trong mã chương trình nạp vào thiết bị, hướng đến sự gọn nhẹ, ít ảnh hưởng đến tốc độ xử lý.
 
 \subsection{Phòng chống tấn công DIS flooding}
+\label{prevention:dis-flooding}
+
 Như đã giới thiệu ở phần \ref{subsec:dis_flooding}, đồ án xây dựng hệ thống IDS dựa trên giải pháp DIS-FDM đối với dạng tấn công làm ngập DIS. Tác giả chọn ngưỡng tối đa cho phép xử lý gói tin DIS là DTL = $\frac{1}{2}$. Khi mới khởi động nút, DTL cũng được thiết lập để mang giá trị trên. Mỗi khi một gói tin được chấp nhận để xử lý, mẫu số sẽ được cộng thêm 1. Tiếp đến, nếu gói tin được chấp nhận là bản tin DIS, tử số cũng sẽ được cộng thêm 1. Nếu tỷ lệ DTL vượt quá ngưỡng 0.5, nút sẽ từ chối xử lý các gói tin DIS tiếp theo cho đến khi DTL giảm xuống dưới ngưỡng. Sau khoảng thời gian 5 giây, tổng số gói tin và số gói tin DIS sẽ được đặt lại về 0 (DTL quay về lại giá trị $\frac{1}{2}$), cho phép nút tiếp tục xử lý các gói tin DIS mới.
 
 Thuật toán phòng chống được triển khai dưới dạng mã nguồn C với bộ thư viện contiki-ng, được chia làm hai phần chính: một phần xử lý gói tin và một phần định kỳ đặt lại giá trị DTL. 
@@ -86,3 +88,5 @@ PROCESS_THREAD(dis_counter, ev, data)
     PROCESS_END();
 }
 \end{verbatim}
+
+\section{Phòng chống tấn công phiên bản DAG}
