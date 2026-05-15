@@ -1,8 +1,87 @@
 % ============================================================
 %  Chapter 4.tex — THIẾT KẾ IDS PHÁT HIỆN TẤN CÔNG RPL
 % ============================================================
-\section{THIẾT KẾ IDS PHÁT HIỆN TẤN CÔNG RPL}
+\section{THIẾT KẾ VÀ TRIỂN KHAI IDS PHÁT HIỆN TẤN CÔNG RPL}
 \label{sec:ch4}
 
-% TODO: Nội dung chương 4.
-\subsection{Đối với việc phòng chống tấn công DIS flooding}
+Chương này trình bày thiết kế và triển khai hệ thống IDS phát hiện tấn công RPL. Hệ thống được xây dựng dựa trên việc phân tích gói tin và so sánh với quy tắc nhằm phát hiện bất thường trong giao thức RPL. Hệ thống được triển khai trực tiếp trong mã chương trình nạp vào thiết bị, hướng đến sự gọn nhẹ, ít ảnh hưởng đến tốc độ xử lý.
+
+\subsection{Phòng chống tấn công DIS flooding}
+Như đã giới thiệu ở phần \ref{subsec:dis_flooding}, đồ án xây dựng hệ thống IDS dựa trên giải pháp DIS-FDM đối với dạng tấn công làm ngập DIS. Tác giả chọn ngưỡng tối đa cho phép xử lý gói tin DIS là DTL = $\frac{1}{2}$. Khi mới khởi động nút, DTL cũng được thiết lập để mang giá trị trên. Mỗi khi một gói tin được chấp nhận để xử lý, mẫu số sẽ được cộng thêm 1. Tiếp đến, nếu gói tin được chấp nhận là bản tin DIS, tử số cũng sẽ được cộng thêm 1. Nếu tỷ lệ DTL vượt quá ngưỡng 0.5, nút sẽ từ chối xử lý các gói tin DIS tiếp theo cho đến khi DTL giảm xuống dưới ngưỡng. Sau khoảng thời gian 5 giây, tổng số gói tin và số gói tin DIS sẽ được đặt lại về 0 (DTL quay về lại giá trị $\frac{1}{2}$), cho phép nút tiếp tục xử lý các gói tin DIS mới.
+
+Thuật toán phòng chống được triển khai dưới dạng mã nguồn C với bộ thư viện contiki-ng, được chia làm hai phần chính: một phần xử lý gói tin và một phần định kỳ đặt lại giá trị DTL. 
+
+Phần xử lý gói tin (đoạn mã \ref{code:dis-prevention-netstack}) kiểm tra loại gói tin, kiểm tra DTL để đưa ra quyết định với gói tin DIS, và cập nhật DTL dựa trên số lượng gói tin đã xử lý. Phần này được triển khai dưới dạng một hàm được gọi trước khi gói tin đi vào quá trình xử lý chính thức của hệ thống mạng, sử dụng thư viện netstack của contiki-ng để can thiệp vào quá trình xử lý gói tin.
+
+\phantomsection\label{code:dis-prevention-netstack}
+
+\begin{verbatim}
+static enum netstack_ip_action
+ip_input(void)
+{
+    uint8_t proto = 0;
+    uipbuf_get_last_header(uip_buf, uip_len, &proto);
+    if (proto != UIP_PROTO_ICMP6 ||
+        UIP_ICMP_BUF->type != ICMP6_RPL ||
+        UIP_ICMP_BUF->icode != RPL_CODE_DIS) {
+        total_packets++;
+        return NETSTACK_IP_PROCESS;
+    }
+    float dis_ratio = (float)(dis_packets + 1) 
+                    / (float)(total_packets + 2);
+    if (dis_ratio > RPL_DIS_PREVENTION_THRESHOLD) {
+        LOG_INFO("Dropping DIS packet. From: ");
+        LOG_INFO_6ADDR(&UIP_IP_BUF->srcipaddr);
+        LOG_INFO_(" DIS ratio: %u%%\n", 
+                (unsigned int)(dis_ratio * 100));
+        return NETSTACK_IP_DROP;
+    }
+    total_packets++;
+    dis_packets++;
+    LOG_INFO("Accepting DIS packet. From: ");
+    LOG_INFO_6ADDR(&UIP_IP_BUF->srcipaddr);
+    LOG_INFO_(" DIS ratio: %u%%\n", (unsigned int)(dis_ratio * 100));
+    return NETSTACK_IP_PROCESS;
+}
+[...]
+struct netstack_ip_packet_processor packet_processor = {
+    .process_input = ip_input,
+    .process_output = ip_output
+};
+[...]
+// tiến trình chính
+PROCESS_THREAD(udp_client_process, ev, data)
+{
+    [...]
+    PROCESS_BEGIN();
+    // Đăng ký bộ xử lý gói tin tùy chỉnh
+    netstack_register_ip_packet_processor(&packet_processor);
+    [...]
+    PROCESS_END();
+}
+\end{verbatim}
+
+Phần đặt lại giá trị DTL (đoạn mã \ref{code:dis-prevention-process}) sẽ được thực hiện định kỳ sau mỗi 5 giây để đảm bảo hệ thống có thể tiếp tục hoạt động bình thường sau khi đã từ chối một số lượng gói tin DIS nhất định. Phần này được triển khai dưới dạng một tiến trình riêng biệt khỏi tiến trình chính của node.
+
+\phantomsection\label{code:dis-prevention-process}
+\begin{verbatim}
+PROCESS(dis_counter, "DIS Periodic Counter");
+
+PROCESS_THREAD(dis_counter, ev, data)
+{
+    static struct etimer periodic_timer;
+
+    PROCESS_BEGIN();
+
+    while (1)
+    {
+        etimer_set(&periodic_timer, CLOCK_SECOND * 5);
+        PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&periodic_timer));
+        total_packets = 0;
+        dis_packets = 0;
+        etimer_reset(&periodic_timer);
+    }
+
+    PROCESS_END();
+}
+\end{verbatim}
