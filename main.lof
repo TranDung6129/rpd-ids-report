@@ -1,1 +1,5 @@
 \contentsline {figure}{\numberline {3.1}{\ignorespaces Cơ chế DIS Flooding Attack: kẻ tấn công A liên tục phát DIS, buộc các nút lân cận reset Trickle Timer và phát DIO}}{14}{figure.caption.14}%
+\contentsline {figure}{\numberline {5.2}{\ignorespaces Tiêu thụ năng lượng DIS Flooding: CPU (trái) và Radio (phải)}}{42}{figure.caption.21}%
+\contentsline {figure}{\numberline {5.3}{\ignorespaces Tiêu thụ năng lượng DAG Version Attack: CPU (trái) và Radio (phải)}}{43}{figure.caption.22}%
+\contentsline {figure}{\numberline {5.4}{\ignorespaces Tiêu thụ năng lượng Blackhole Attack: CPU (trái) và Radio (phải)}}{44}{figure.caption.23}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Tiêu thụ năng lượng Decreased Rank Attack: CPU (trái) và Radio (phải)}}{44}{figure.caption.24}%

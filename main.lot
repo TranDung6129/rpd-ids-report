@@ -1,4 +1,7 @@
 \contentsline {table}{\numberline {2.1}{\ignorespaces Ma trận nhầm lẫn của IDS}}{12}{table.caption.12}%
 \contentsline {table}{\numberline {2.2}{\ignorespaces Tham số cấu hình mô phỏng Cooja}}{13}{table.caption.13}%
 \contentsline {table}{\numberline {3.3}{\ignorespaces So sánh bốn kiểu tấn công RPL được nghiên cứu}}{19}{table.caption.15}%
-\contentsline {table}{\numberline {B.4}{\ignorespaces Tham số cấu hình chung trong Cooja}}{27}{table.caption.18}%
+\contentsline {table}{\numberline {5.4}{\ignorespaces Kết quả đánh giá độ chính xác trong việc phát hiện tấn công}}{41}{table.caption.18}%
+\contentsline {table}{\numberline {5.5}{\ignorespaces Tổng số gói tin (DIO / DIS / DAO) theo kịch bản}}{41}{table.caption.19}%
+\contentsline {table}{\numberline {5.6}{\ignorespaces Packet Delivery Ratio (PDR) - Chi tiết Upstream/Downstream}}{42}{table.caption.20}%
+\contentsline {table}{\numberline {B.7}{\ignorespaces Tham số cấu hình chung trong Cooja}}{50}{table.caption.27}%

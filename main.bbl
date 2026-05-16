@@ -7,7 +7,8 @@
 \providecommand{\BIBentrySTDinterwordspacing}{\spaceskip=0pt\relax}
 \providecommand{\BIBentryALTinterwordstretchfactor}{4}
 \providecommand{\BIBentryALTinterwordspacing}{\spaceskip=\fontdimen2\font plus
-\BIBentryALTinterwordstretchfactor\fontdimen3\font minus \fontdimen4\font\relax}
+\BIBentryALTinterwordstretchfactor\fontdimen3\font minus
+  \fontdimen4\font\relax}
 \providecommand{\BIBforeignlanguage}[2]{{%
 \expandafter\ifx\csname l@#1\endcsname\relax
 \typeout{** WARNING: IEEEtran.bst: No hyphenation pattern has been}%
@@ -21,26 +22,41 @@
 \BIBdecl
 
 \bibitem{prajisha2025dis}
-C.~Prajisha and A.~R. Vasudevan, ``Detection and mitigation of multicast {DIS} flooding attacks in {RPL}-based {IoT} networks,'' \emph{Ad Hoc Networks}, vol. 179, p. 104002, 2025.
+C.~Prajisha and A.~R. Vasudevan, ``Detection and mitigation of multicast {DIS}
+  flooding attacks in {RPL}-based {IoT} networks,'' \emph{Ad Hoc Networks},
+  vol. 179, p. 104002, 2025.
 
 \bibitem{winter2012rpl}
 \BIBentryALTinterwordspacing
-T.~Winter, P.~Thubert, A.~Brandt, J.~Hui, R.~Kelsey, P.~Levis, K.~Pister, R.~Struik, J.~Vasseur, and R.~Alexander, ``{RPL}: {IPv6} routing protocol for low-power and lossy networks,'' IETF, Tech. Rep. RFC 6550, 2012. [Online]. Available: \url{https://tools.ietf.org/html/rfc6550}
+T.~Winter, P.~Thubert, A.~Brandt, J.~Hui, R.~Kelsey, P.~Levis, K.~Pister,
+  R.~Struik, J.~Vasseur, and R.~Alexander, ``{RPL}: {IPv6} routing protocol for
+  low-power and lossy networks,'' IETF, Tech. Rep. RFC 6550, 2012. [Online].
+  Available: \url{https://tools.ietf.org/html/rfc6550}
 \BIBentrySTDinterwordspacing
 
 \bibitem{dvir2011vera}
-A.~Dvir, T.~Holczer, and L.~Butt{\'y}an, ``{VeRA} -- version number and rank authentication in {RPL},'' in \emph{2011 IEEE 8th International Conference on Mobile Ad-Hoc and Sensor Systems (MASS)}, 2011, pp. 709--714.
+A.~Dvir, T.~Holczer, and L.~Butt{\'y}an, ``{VeRA} -- version number and rank
+  authentication in {RPL},'' in \emph{2011 IEEE 8th International Conference on
+  Mobile Ad-Hoc and Sensor Systems (MASS)}, 2011, pp. 709--714.
 
 \bibitem{overview_rpl_framework}
-{LINGI2146 Project -- UCLouvain}, ``{RPL} attacks framework,'' 2016, course project report.
+{LINGI2146 Project -- UCLouvain}, ``{RPL} attacks framework,'' 2016, course
+  project report.
 
 \bibitem{sharma2022blackhole}
-D.~K. Sharma, S.~K. Dhurandher, S.~Kumaram, K.~Datta~Gupta, and P.~K. Sharma, ``Mitigation of black hole attacks in {6LoWPAN} {RPL}-based wireless sensor network for cyber physical systems,'' \emph{Computer Communications}, vol. 189, pp. 182--192, 2022.
+D.~K. Sharma, S.~K. Dhurandher, S.~Kumaram, K.~Datta~Gupta, and P.~K. Sharma,
+  ``Mitigation of black hole attacks in {6LoWPAN} {RPL}-based wireless sensor
+  network for cyber physical systems,'' \emph{Computer Communications}, vol.
+  189, pp. 182--192, 2022.
 
 \bibitem{raza2013svelte}
-S.~Raza, L.~Wallgren, and T.~Voigt, ``{SVELTE}: Real-time intrusion detection in the internet of things,'' \emph{Ad Hoc Networks}, vol.~11, no.~8, pp. 2661--2674, 2013.
+S.~Raza, L.~Wallgren, and T.~Voigt, ``{SVELTE}: Real-time intrusion detection
+  in the internet of things,'' \emph{Ad Hoc Networks}, vol.~11, no.~8, pp.
+  2661--2674, 2013.
 
 \bibitem{wallgren2013routing}
-L.~Wallgren, S.~Raza, and T.~Voigt, ``Routing attacks and countermeasures in the {RPL}-based internet of things,'' in \emph{International Journal of Distributed Sensor Networks}, vol.~9, no.~8, 2013.
+L.~Wallgren, S.~Raza, and T.~Voigt, ``Routing attacks and countermeasures in
+  the {RPL}-based internet of things,'' in \emph{International Journal of
+  Distributed Sensor Networks}, vol.~9, no.~8, 2013.
 
 \end{thebibliography}
