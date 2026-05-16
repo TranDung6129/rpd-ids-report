@@ -89,4 +89,532 @@ PROCESS_THREAD(dis_counter, ev, data)
 }
 \end{verbatim}
 
-\section{Phòng chống tấn công phiên bản DAG}
+\subsection{Phòng chống tấn công phiên bản DAG}
+\label{prevention:dag-version-attacks}
+\subsection{Thiết kế}
+Đồ án xây dựng cơ chế phòng chống tấn công phiên bản DAG dựa trên giải pháp VeRa. Tuy nhiên, do hạn chế về thời gian và năng lực, tập trung vào việc phát hiện và phản ứng với các gói tin RPL có phiên bản DAG không hợp lệ và bỏ qua phần kiểm tra rank được nhắc đến trong bài đề xuất VeRa.
+
+Quá trình hoạt động của giải pháp được triển khai trong đồ án bao gồm các bước sau:
+
+\begin{enumerate}
+    \item Khi nút gốc bắt đầu hoạt động, nó khởi tạo một chuỗi hash lưu trữ các phiên bản DAG hợp lệ.
+    \item Nút gốc lấy phiên bản DAG đầu tiên từ giá trị cuối cùng của chuỗi hash.
+    \item Việc gửi DIO sẽ được thực hiện như trong một mạng DIO bình thường.
+    \item Trong quá trình khởi tạo mạng (các nút còn lại chưa lưu trữ phiên bản DAG), nút sẽ lấy phiên bản DAG từ gói tin DIO đầu tiên mà nó nhận được và lưu trữ nó như một phiên bản DAG hợp lệ.
+    \item Sau khi tham gia mạng, cơ chế kiểm tra phiên bản bắt đầu hoạt động.
+    \item Khi nhận gói DIO chứa phiên bản DAG khác với phiên bản DAG hiện tại được lưu trong nút, nút sẽ thực hiện hàm hash với số phiên bản DAG mới và so sánh với phiên bản DAG hiện tại. Nếu kết quả hash không khớp, nút sẽ từ chối gói DIO và đưa nút gửi vào danh sách đen.
+    \item Nếu nút gửi bị đưa vào danh sách đen, nút sẽ từ chối tất cả các gói tin RPL từ nút đó.
+\end{enumerate}
+
+Quá trình trên giả định rằng nút gốc không bị giả, cũng như quá trình tấn công chỉ xảy ra sau khi mạng đã được khởi tạo và các nút đã lưu trữ phiên bản DAG hợp lệ. Nhóm tác giả không xét đến trường hợp tấn công trong giai đoạn khởi tạo mạng.
+
+\subsubsection{Triển khai}
+Giải pháp được triển khai dưới dạng mã nguồn C với bộ thư viện contiki-ng, tương tự như phần phòng chống tấn công DIS flooding. Mã triển khai bao gồm phần xử lý gói tin tại netstack để kiểm tra phiên bản DAG trong gói DIO, và một bản tuỳ chỉnh của thư viện \texttt{rpl-lite} để quản lý chuỗi hash.
+
+Tác giả đã thêm mảng chứa các phiên bản DAG hợp lệ, gồm 32 phần tử:
+
+Trong file \texttt{rpl-lite/rpl-const.h}:
+\begin{verbatim}
+[...]
+#define MAX_DAG_VER_HASH_ENTRIES 32
+[...]
+\end{verbatim}
+
+Tại nút gốc, các phiên bản DAG hợp lệ sẽ được khởi tạo và lưu trữ trong một mảng. Một biến đếm sẽ được sử dụng để theo dõi chỉ số hiện tại trong mảng.
+
+\begin{verbatim}
+[...]
+// Mảng lưu trữ các phiên bản DAG hợp lệ
+// cùng biến đếm chỉ số hiện tại trong mảng
+static uint8_t dag_versions[MAX_DAG_VER_HASH_ENTRIES];
+static uint8_t dag_ver_index;
+[...]
+\end{verbatim}
+
+Một hàm hash đơn giản được sử dụng tại cả nút gốc và các nút khác. Tại nút gốc, hàm hash được dùng để khởi tạo phần tử tiếp theo trong chuỗi hash. Tại nút con, hàm hash sẽ dùng để kiểm tra xem phiên bản mới có hash ra phiên bản hiện tại hay không. Do phiên bản DAG chỉ có 8 bit, hàm hash được thiết kế để đảm bảo số phiên bản luôn nằm trong khoảng 0-255. Hàm hash được triển khai như sau:
+
+\begin{verbatim}
+[...]
+uint8_t dag_ver_hash(uint8_t input)
+{
+    return (input * 31) % 256;
+}
+[...]
+\end{verbatim}
+
+Chuỗi hash được khởi tạo tại nút gốc khi bắt đầu hoạt động:
+\begin{verbatim}
+[...]
+void dag_ver_chain_init(uint8_t input_value) {
+  dag_versions[MAX_DAG_VER_HASH_ENTRIES - 1] 
+        = dag_ver_hash(input_value);
+  for (int i = MAX_DAG_VER_HASH_ENTRIES - 2; i >= 0; i--)
+  {
+    dag_versions[i] = dag_ver_hash(dag_versions[i + 1]);
+  }
+}
+[...]
+\end{verbatim}
+
+Khi nút gốc cần thực hiện global repair, nó sẽ cập nhật phiên bản DAG mới bằng cách lấy giá trị tiếp theo trong chuỗi hash:
+
+\begin{verbatim}
+dag_ver_index = (dag_ver_index + 1) % MAX_DAG_VER_HASH_ENTRIES;
+curr_instance.dag.version = dag_versions[dag_ver_index];
+\end{verbatim}
+
+Điều kiện phát hiện phiên bản không hợp lệ đối với các nút con cũng thay đổi từ phiên bản trên DIO có số nhỏ hơn phiên bản DAG hiện tại sang việc so sánh kết quả hash của phiên bản mới với phiên bản hiện tại:
+
+\begin{verbatim}
+// lấy giá trị hash phiên bản mới
+// khoảng cách tối đa là 10 lần hash
+uint8_t newver = dio->version;
+  for (int i = 0; i < 10; i++) {
+    if (newver == curr_instance.dag.version) {
+      break;
+    }
+    newver = dag_ver_hash(newver);
+}
+// nếu sau 10 lần hash vẫn không khớp,
+// coi như phiên bản mới không hợp lệ
+if(newver != curr_instance.dag.version) {
+    LOG_INFO("Invalid DAG version from ");
+    LOG_INFO_6ADDR(from);
+    LOG_INFO_(", our version %u, recv %u\n", 
+        curr_instance.dag.version, dio->version);
+    // Nếu đó là nút gốc gửi gói DIO với phiên bản không hợp lệ,
+    // giả định đó là gói tin hợp lệ và thực hiện reset phiên bản.
+    if(dio->rank == ROOT_RANK) {
+      rpl_timers_dio_reset("Heard old version from root");
+    }
+    return;
+}
+\end{verbatim}
+
+Trong phạm vi đồ án, nhóm tác giả chưa hoàn thiện việc tạo chuỗi hash mới khi chỉ số đếm đạt đến giới hạn của mảng. Tuy nhiên, quá trình mô phỏng về cơ bản sẽ không kéo dài tới thời điểm này, do đó khía cạnh này sẽ tạm thời được bỏ qua.
+
+Đối với phần phát hiện gói tin, nhóm tác giả sử dụng thư viện netstack để can thiệp vào quá trình xử lý gói tin RPL.
+
+\begin{verbatim}
+[...]
+if (uip_buf[UIP_IPH_LEN + uip_ext_len + 5] 
+    != curr_instance.dag.version)
+{
+    if (dag_ver_hash(uip_buf[UIP_IPH_LEN + uip_ext_len + 5])
+        != curr_instance.dag.version)
+    {
+        if (!rpl_dag_root_is_root())
+        {
+            if (!curr_instance.dag.preferred_parent) {
+                return NETSTACK_IP_PROCESS;
+            }
+
+            if (!uip_ip6addr_cmp(&UIP_IP_BUF->srcipaddr, 
+                            &root_ipaddr)
+                && uip_ip6addr_cmp(&UIP_IP_BUF->srcipaddr,
+                rpl_neighbor_get_ipaddr
+                    (curr_instance.dag.preferred_parent)
+                )
+            ) {
+                // xoá preferred parent
+                nbr_table_remove(rpl_neighbors, 
+                    curr_instance.dag.preferred_parent);
+                curr_instance.dag.preferred_parent = NULL;
+                rpl_dag_update_state();
+                need_version_repair = 1;
+            }
+            if (!uip_ip6addr_cmp(&UIP_IP_BUF->srcipaddr,
+                &blacklisted_ipaddr))
+            {
+                // thêm vào blacklist
+                uip_ip6addr_copy(&blacklisted_ipaddr, 
+                    &UIP_IP_BUF->srcipaddr);
+                blacklist_timer_needs_reset = true;
+            }
+        }
+        return NETSTACK_IP_DROP;
+    }
+}
+[...]
+\end{verbatim}
+
+\subsection{Phòng chống tấn công blackhole}
+\label{prevention:blackhole}
+\subsection{Thiết kế}
+Quá trình phòng chống tấn công dựa trên cơ chế tin tưởng - nghi ngờ - xác nhận. Quá trình này được áp dụng cho các nút con sau khi tìm được preferred parent, gồm các bước sau:
+
+\begin{enumerate}
+    \item Sau khi xác định preferred parent, nút con sẽ tạm thời tin cậy và theo dõi các gói tin không phải RPL có địa chỉ nguồn lớp liên kết là preferred parent trong khoảng thời gian 5 giây. Nếu nhận được gói tin, thời gian chờ sẽ được đặt lại.
+    \item Nếu sau khoảng thời gian chỉ định trước (trong đồ án này là 5 giây) không nhận được gói tin nào, nút con sẽ đánh dấu preferred parent là nghi ngờ và quảng bá gói tin UDP chứa bản tin yêu cầu xác thực (verification-request) đến các nút lân cận, đồng thời đặt một khoảng thời gian chờ.
+    \item Các nút lân cận khi nhận yêu cầu sẽ đồng loạt gửi bản tin yêu cầu xác thực đến nút bị nghi ngờ (suspect-verification-request).
+    \item Nút bị nghi ngờ khi nhận được yêu cầu xác thực (suspect-verification-request) sẽ phản hồi bằng một gói tin chứa bản tin xác nhận rằng nó không phải là nút blackhole (suspect-reply).
+    \item Nút con nhận được bản tin suspec-reply sẽ gửi bản tin xác nhận (verification-confirmation) đến các nút đã gửi yều cầu đầu tiên (verification-request) để thông báo rằng preferred parent không phải là blackhole.
+    \item Nếu sau một khoảng thời gian được chỉ định (trong trường hợp này là 10 giây) kể từ lúc gửi verification-request, nút con không nhận được bất kỳ bản tin xác nhận nào, nó sẽ đánh dấu preferred parent là blackhole và từ chối tất cả các gói tin từ nút đó, đồng thời gỡ nút bị đánh dấu khỏi vị trí preferred parent cũn như khỏi bảng các nút lân cận.
+    \item Nút con sau đó sẽ tìm kiếm preferred parent mới, và lặp lại quá trình trên.
+\end{enumerate}
+
+\subsubsection{Triển khai}
+
+Tác giả xây dựng cấu trúc các gói tin xác thực như sau:
+
+\begin{verbatim}
+// bản tin verification-request sẽ được 
+// gửi đến các nút lân cận để yêu cầu xác thực preferred parent
+struct verification_request_packet {
+    uint8_t type;
+    // địa chỉ ip của nút bị nghi ngờ
+    uip_ip6addr_t suspect_ip;
+};
+typedef struct verification_request_packet
+        verification_req_t;
+
+// bản tin suspect-verification-request sẽ được các nút
+// nhận verification-request gửi đến nút bị nghi ngờ để 
+// yêu cầu nó chứng minh rằng nó không phải là blackhole
+struct suspect_verification_request_packet {
+    uint8_t type;
+    // địa chỉ ip của nút gửi verification-request
+    uip_ip6addr_t initiator_ip;
+};
+typedef struct suspect_verification_request_packet
+        suspect_verification_req_t;
+
+// bản tin suspect-reply sẽ được nút nhận suspect-verification-request
+// gửi đến các nút đã gửi yêu cầu để xác nhận rằng nó không phải
+// là blackhole
+struct suspect_clean_response_packet {
+    uint8_t type;
+    // địa chỉ ip của nút gửi verification-request
+    uip_ip6addr_t initiator_ip;
+    // do nút bị nghi ngờ chính là nút gửi bản tin này,
+    // địa chỉ của nút bị nghi ngờ sẽ là địa chỉ nguồn
+    // trong header ipv6, nên không cần lưu trong bản tin này.
+};
+typedef struct suspect_clean_response_packet
+        suspect_clean_resp_t;
+
+// nút nhận suspect-reply sẽ gửi bản tin xác nhận đến nút
+// đã gửi verification-request để thông báo rằng preferred parent
+// không phải là blackhole
+struct verification_confirmation_packet {
+    uint8_t type;
+    // địa chỉ ip của nút bị nghi ngờ
+    uip_ip6addr_t suspect_ip;
+};
+typedef struct verification_confirmation_packet
+        verification_conf_t;
+\end{verbatim}
+
+Chương trình phòng chống tấn công blackhole sẽ được triển khai thành 3 phần: phần netstack, tiến trình chuyển trạng thái giữa tin tưởng và nghi ngờ, và tiến trình chuyển trạng thái giữa nghi ngờ và xác nhận nút hợp lệ/blackhole.
+
+Phần netstack input sẽ đọc các gói tin không phải RPL và reset thời gian tin tưởng nếu nhận được gói tin từ preferred parent:
+
+\begin{verbatim}
+static enum netstack_ip_action
+ip_input(void)
+{
+    uint8_t proto = 0;
+    uipbuf_get_last_header(uip_buf, uip_len, &proto);
+
+    // huỷ các gói tin đến từ nút bị đánh dấu là blackhole
+    if (uip_ip6addr_cmp(&UIP_IP_BUF->srcipaddr,
+        &blacklisted_ipaddr))
+    {
+        return NETSTACK_IP_DROP;
+    }
+
+    // cho các gói tin RPL đi qua,
+    // không can thiệp vào quá trình xử lý
+    if (proto == UIP_PROTO_ICMP6)
+    {
+        return NETSTACK_IP_PROCESS;
+    }
+
+    if (curr_instance.dag.preferred_parent &&
+        linkaddr_cmp(packetbuf_addr(PACKETBUF_ADDR_SENDER),
+            rpl_neighbor_get_lladdr(curr_instance.dag.preferred_parent))
+    )
+    {
+        // nếu nhận được gói tin
+        // không phải RPL từ preferred parent,
+        // đánh dấu flag để chuẩn bị
+        // reset bộ đếm ngược thời gian tin tưởng
+        trust_timer_reset = true;
+    }
+    return NETSTACK_IP_PROCESS;
+}
+\end{verbatim}
+
+Phần tiến trình chuyển trạng thái giữa tin tưởng và nghi ngờ sẽ theo dõi thời gian tin tưởng và gửi yêu cầu xác thực nếu thời gian này hết hạn:
+
+\begin{verbatim}
+// đợi cho đến khi có preferred parent
+while(!(NETSTACK_ROUTING.node_is_reachable()
+    && curr_instance.dag.preferred_parent))
+{
+    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&startup_timer));
+    etimer_reset(&startup_timer);
+}
+
+// khi đã tìm thấy preferred parent,
+// bắt đầu tin tưởng và theo dõi
+suspected_node_is_safe = true;
+etimer_set(&trust_timer, TRUST_SECONDS * CLOCK_SECOND);
+
+while (1)
+{
+    // đợi đến khi preferred parent được báo là an toàn
+    // để bắt đầu theo dõi
+    PROCESS_WAIT_EVENT_UNTIL(suspected_node_is_safe);
+
+    // đợi đến khi có yêu cầu reset thời gian tin tưởng
+    // hoặc thời gian tin tưởng hết hạn
+    PROCESS_WAIT_EVENT_UNTIL(trust_timer_reset || 
+        etimer_expired(&trust_timer));
+
+    // nếu cờ trust_timer_reset được đặt,
+    // reset bộ đếm thời gian tin tưởng
+    // và tiếp tục theo dõi ở vòng lặp tiếp theo
+    if (trust_timer_reset)
+    {
+        etimer_reset(&trust_timer);
+        trust_timer_reset = false;
+        continue;
+    }
+    // nếu thời gian tin tưởng hết hạn,
+    // dựng bản tin verification-request
+    // và multicast đến các nút lân cận
+    else if (etimer_expired(&trust_timer))
+    {
+        verification_req_t verif_req;
+        verif_req.type = VERIFICATION_REQ_TYPE;
+        verif_req.suspect_ip = *rpl_neighbor_get_ipaddr(curr_instance.dag.preferred_parent);
+        simple_udp_sendto(&verif_udp_conn, &verif_req, sizeof(verif_req), &rpl_multicast_addr);
+        // tắt cờ tin tưởng, chuyển sang trạng thái nghi ngờ
+        suspected_node_is_safe = false;
+        continue;
+    }
+}
+\end{verbatim}
+
+Phần tiến trình chuyển trạng thái giữa nghi ngờ và xác nhận nút hợp lệ/blackhole sẽ theo dõi thời gian chờ xác nhận và cập nhật trạng thái của preferred parent dựa trên việc có nhận được xác nhận hay không:
+
+\begin{verbatim}
+while(1)
+{
+    // đợi cho đến khi có preferred parent
+    while (finding_new_parent)
+    {
+        // khi đã tìm thấy preferred parent,
+        // phá vỡ vòng lặp,
+        // bắt đầu tin tưởng và theo dõi
+        if (curr_instance.dag.preferred_parent) {
+            finding_new_parent = false;
+            suspected_node_is_safe = true;
+            trust_timer_reset = true;
+            break;
+        }
+        PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&startup_timer));
+        etimer_reset(&startup_timer);
+    }
+
+    // đợi đến khi thời gian chờ xác nhận hết hạn
+    // hoặc cờ suspected_node_is_safe được đặt,
+    // xác nhận preferred parent là an toàn
+    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&suspect_timer)
+        || suspected_node_is_safe);
+
+    // nếu preferred parent là nút gốc, bỏ qua việc đánh giá
+    // giả định rằng nút gốc không bị giả mạo
+    if (curr_instance.dag.preferred_parent
+        && curr_instance.dag.preferred_parent->rank == ROOT_RANK)
+    {
+        continue;
+    }
+    // nếu cờ suspected_node_is_safe được đặt,
+    // reset bộ đếm thời gian nghi ngờ
+    if (suspected_node_is_safe)
+    {
+        etimer_reset(&suspect_timer);
+    }
+    // ngược lại, nếu thời gian chờ xác nhận
+    // hết hạn mà không nhận được bản tin
+    // verification-confirmation
+    else if (etimer_expired(&suspect_timer))
+    {   
+        // lưu lại địa chỉ IP của nút bị nghi ngờ vào blacklist        
+        uip_ip6addr_copy(&blacklisted_ipaddr,
+            rpl_neighbor_get_ipaddr
+                (curr_instance.dag.preferred_parent)
+        );
+
+        // bỏ preferred parent khỏi bảng các nút lân cận
+        nbr_table_remove(rpl_neighbors,
+            curr_instance.dag.preferred_parent);
+
+        // gỡ trạng thái preferred parent
+        curr_instance.dag.preferred_parent = NULL;
+
+        // cập nhật lại trạng thái DAG để tìm preferred parent mới
+        rpl_dag_update_state();
+
+        // đánh dấu cần tìm preferred parent mới
+        finding_new_parent = true;
+
+        // đặt lại bộ đếm thời gian chờ xác nhận
+        etimer_set(&startup_timer, CLOCK_SECOND);
+    }
+}
+\end{verbatim}
+
+\subsection{Phòng chống tấn công hạ Rank (giả mạo rank thấp hơn)}
+\label{prevention:rank-attacks}
+\subsubsection{Thiết kế}
+Thay vì sử dụng phương pháp hash được đề xuất trong bài VeRa, đồ án triển khai một cơ chế đơn giản hơn để phát hiện tấn công hạ Rank bằng cách thêm điều kiện so sánh số bước nhảy. Việc kiểm tra rank sẽ chia thành hai giai đoạn chính: giai đoạn khởi tạo mạng và giai đoạn ổn định sau khi mạng đã được khởi tạo.
+
+Tại giai đoạn khởi tạo mạng (đồ án sẽ đặt khoảng thời gian 2 phút đầu), hệ thống được giả định là không xảy ra tấn công. Do đó, nút sẽ chấp nhận rank từ các gói DIO mà nó nhận được và lưu trữ rank của nút gửi làm rank hợp lệ. Khi nhận gói DIO mới, nút sẽ kiểm tra điều kiện chi phí đường đi dựa trên rank và chỉ số đường truyền ETX. Nếu chi phí đường đi đến gói vừa gửi DIO thấp hơn chi phí đường đi đến peferred parent hiện tại một khoảng lớn hơn ngưỡng cho trước (đã được định nghĩa sẵn trong thư viện của contiki-ng), nút sẽ chấp nhận gói DIO đó và cập nhật rank hợp lệ mới. Nếu không, nút sẽ từ chối gói DIO đó.
+
+Khi đã xác định được preferred parent và preferred parent không đổi trong 30 giây, cũng như đã qua thời gian khởi tạo mạng, nút sẽ chuyển sang giai đoạn ổn định. Lúc này điều kiện sẽ được siết chặt hơn. Ngoài điều kiện chi phí đường đi, nút sẽ chỉ chấp nhận cập nhật preferred parent nếu só bước nhảy từ gói gửi DIO đến nút gốc thấp hơn số bước nhảy từ preferred parent hiện tại đến nút gốc.
+
+\subsubsection{Triển khai}
+
+Đối với giai đoạn khởi tạo mạng, do thư viện rpl-lite đã có sẵn cơ chế kiểm tra chi phí đường đi, nhóm tác giả không can thiệp gì thêm vào mã nguồn. Đối với giai đoạn ổn định, nhóm tác giả đã thêm điều kiện so sánh số bước nhảy vào dưới dạng một option mới trong gói DIO. Option này sẽ được thêm vào gói DIO tại nút gửi, và được kiểm tra tại nút nhận.
+
+Trong file \texttt{rpl-lite/rpl-types.h}, nhóm tác giả thêm hops\_count vào cấu trúc DAG và neighbor:
+\begin{verbatim}
+struct rpl_dag {
+    [...]
+    // số bước nhảy từ DAG root đến node này
+    uint8_t hops_count;
+};
+
+struct rpl_nbr {
+    [...]
+    // số bước nhảy từ DAG root đến neighbor này
+    uint8_t hops_count;
+};
+\end{verbatim}
+
+Trong file \texttt{rpl-lite/rpl-icmp6.h}, nhóm tác giả thêm option mới vào gói DIO tại nút gửi:
+\begin{verbatim}
+struct rpl_dio {
+    [...]
+    // option mới chứa số bước nhảy từ node gửi DIO đến DAG root
+    uint8_t hops_count;
+};
+\end{verbatim}
+
+Quá trình lấy giá trị hops\_count từ gói tin được bổ sung trong \texttt{rpl-lite/rpl-icmp6.c} tại hàm xử lý gói DIO:
+\begin{verbatim}
+static rpl_nbr_t *
+update_nbr_from_dio(uip_ipaddr_t *from, rpl_dio_t *dio)
+{
+    [...]
+    switch(subopt_type) {
+        [...]
+        case RPL_OPTION_HOPS:
+            dio.hops_count = buffer[i + 2];
+            break;
+        [...]
+    }
+    [...]
+}
+\end{verbatim}
+
+Cũng trong file \texttt{rpl-lite/rpl-icmp6.c}, hops\_count được tính toán và thêm vào gói DIO tại hàm gửi DIO:
+
+\begin{verbatim}
+void
+rpl_icmp6_dio_output(uip_ipaddr_t *uc_addr)
+{
+    [...]
+    #if RPL_WITH_HOP_COUNT
+
+    buffer[pos++] = RPL_OPTION_HOPS;
+    buffer[pos++] = 1;
+    buffer[pos++] = curr_instance.dag.hops_count;
+
+    #endif /* RPL_WITH_HOP_COUNT */
+    [...]
+}
+\end{verbatim}
+
+Hàm kiểm tra hops\_count hợp lệ được thêm vào trong file \texttt{rpl-lite/rpl-mrhof.c}:
+
+\begin{verbatim}
+static int valid_hop_count(rpl_nbr_t *nbr) {
+// nếu neighbor không tồn tại, coi như không hợp lệ
+  if (nbr == NULL) {
+    return 0;
+  }
+// nếu neighbor có hops_count là 0 nhưng rank lại là ROOT_RANK,
+// coi như hợp lệ (trường hợp neighbor là nút gốc)
+  if (nbr->hops_count == 0 && nbr->rank == ROOT_RANK) {
+    return 1;
+  }
+// nếu neighbor không phải nút gốc,
+// chỉ coi như hợp lệ nếu hops_count lớn hơn 0
+  else {
+    return nbr->hops_count > 0;
+  }
+// mặc định coi như không hợp lệ
+  return 0;
+}
+\end{verbatim}
+
+Trong hàm \texttt{best\_parent}, sau khi loại bỏ các neighbor không hợp lệ về chi phí đường đi, nhóm tác giả thêm điều kiện so sánh hops\_count để chọn parent mới:
+\begin{verbatim}
+static rpl_nbr_t *
+best_parent(rpl_nbr_t *nbr1, rpl_nbr_t *nbr2)
+{
+    [...]
+    if (stabilized_parent) {
+        if (nbr1 == curr_instance.dag.preferred_parent &&
+            (!valid_hop_count(nbr2) 
+            || (nbr1->hops_count <= nbr2->hops_count)))
+        {
+        return nbr1;
+        }
+        if (nbr2 == curr_instance.dag.preferred_parent &&
+            (!valid_hop_count(nbr1) 
+            || (nbr2->hops_count <= nbr1->hops_count))) 
+        {
+        return nbr2;
+        }
+    }
+
+  // từ đây trở xuống là phần mã nguồn gốc
+  LOG_INFO("Comparing two acceptable 
+            parents with path costs %u and %u\n",
+           nbr_path_cost(nbr1), nbr_path_cost(nbr2));
+  return nbr_path_cost(nbr1) < nbr_path_cost(nbr2) 
+        ? nbr1 : nbr2;
+}
+\end{verbatim}
+
+Một tiến trình cũng được tạo ra để theo dõi sự ổn định của preferred parent, dựa trên việc preferred parent có thay đổi hay không trong khoảng thời gian 30 giây. Nếu preferred parent thay đổi, tiến trình sẽ đặt lại bộ đếm thời gian. Nếu preferred parent không thay đổi trong 30 giây, tiến trình sẽ đặt cờ để chuyển sang giai đoạn ổn định.
+
+\begin{verbatim}
+while (1)
+{
+    etimer_set(&periodic_timer, CLOCK_SECOND * 1);
+    PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&periodic_timer));
+
+    // cập nhật thời gian ổn định của preferred parent
+    // cập nhật theo từng giây
+    better_parent_interval = curr_instance.dag.preferred_parent 
+        ? (clock_time() - 
+        curr_instance.dag.preferred_parent->better_parent_since) 
+        : 0;
+    
+    // nếu preferred parent không thay đổi trong 30 giây,
+    // coi như đã ổn định, đặt cờ để siết chặt điều kiện chọn parent
+    if (curr_instance.dag.preferred_parent && 
+        better_parent_interval > 30 * CLOCK_SECOND) {
+        stabilized_parent = true;
+    }
+}
+\end{verbatim}
+
+\subsection{Tổng kết}
+Trong chương này, nhóm tác giả đã trình bày chi tiết về thiết kế và triển khai các hệ thống IDS để phát hiện từng loại tấn công phổ biến trong giao thức RPL, bao gồm tấn công làm ngập DIS, tấn công phiên bản DAG, tấn công blackhole và tấn công hạ Rank. Mỗi giải pháp được xây dựng dựa trên các cơ chế khác nhau, bao gồm: theo dõi tỷ lệ gói tin, sử dụng chuỗi băm, sử dụng cơ chế tin tưởng - nghi ngờ - xác nhận, hoặc với dạng tấn công giảm rank, chỉ đơn giản là thêm một điều kiện kiểm tra gói tin DIO. Các giải pháp này được triển khai trực tiếp trong mã nguồn của từng nút tham gia.

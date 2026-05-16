@@ -287,6 +287,8 @@ INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\listings\lstmis
 INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\listings\listings.cfg
 INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\listings\listings.cfg
 INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\listings\listings.cfg
+INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\enumitem\enumitem.sty
+INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\enumitem\enumitem.sty
 INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\algorithms\algorithm.sty
 INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\algorithms\algorithm.sty
 INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\base\ifthen.sty
@@ -295,8 +297,6 @@ INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\algorithmicx\al
 INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\algorithmicx\algpseudocode.sty
 INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\algorithmicx\algorithmicx.sty
 INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\algorithmicx\algorithmicx.sty
-INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\enumitem\enumitem.sty
-INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\enumitem\enumitem.sty
 INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\forloop\forloop.sty
 INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\forloop\forloop.sty
 INPUT C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex\latex\datetime\datetime.sty

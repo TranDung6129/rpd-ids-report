@@ -1,7 +1,40 @@
 % ============================================================
-%  Chapter 5.tex — DEMO VÀ KIỂM THỬ
+%  Chapter 5.tex — THỰC NGHIỆM VÀ ĐÁNH GIÁ
 % ============================================================
-\section{DEMO VÀ KIỂM THỬ}
+\section{THỰC NGHIỆM VÀ ĐÁNH GIÁ}
 \label{sec:ch5}
+Trong chương này, nhóm sẽ trình bày về quá trình thực nghiệm và đánh giá kết quả của đề tài. Các bước thực nghiệm sẽ được mô tả chi tiết, bao gồm việc thiết lập môi trường thử nghiệm, thu thập dữ liệu, và phân tích kết quả. Ngoài ra, nhóm cũng sẽ so sánh kết quả đạt được với các phương pháp hiện có để đánh giá hiệu quả của giải pháp đề xuất.
 
-% TODO: Nội dung chương 5.
+\subsection{Môi trường thực nghiệm}
+Phần cứng:
+\begin{itemize}
+    \item Máy vi tính: Máy ảo trên nền tảng VirtualBox 7.2.4
+    \item CPU: 4 nhân
+    \item RAM: 8 GB
+    \item Kích thước swap: 4 GB
+\end{itemize}
+
+Phần mềm:
+\begin{itemize}
+    \item Hệ điều hành: Xubuntu 24.04 LTS
+    \item Các công cụ và thư viện cơ bản: git, git-lfs, GCC, doxygen, curl, wireshark, python3-serial, srecord, rlwrap, openjdk-17-jdk (để sử dụng cooja)
+    \item Framework cho firmware: Contiki-NG bản develop
+\end{itemize}
+
+\subsection{Các tiêu chí đánh giá}
+Để đánh giá hiệu quả của giải pháp đề xuất, nhóm sẽ sử dụng các tiêu chí sau:
+
+\begin{itemize}
+    \item Độ chính xác trong việc phát hiện tấn công: Dựa trên tỉ lệ giữa phát hiện đúng và tổng số lần phát hiện.
+    \item Tỉ lệ truyền dữ liệu thành công: Dựa trên tỉ lệ gói tin đến đích so với tổng số gói tin gửi đi từ tất cả các nút. Khi bị tấn công, tỉ lệ này có thể giảm đi. Việc phòng chống giúp hạn chế sự hao hụt này.
+    \item Chi phí gói tin điều khiển RPL: Dựa trên số lượng gói tin RPL được gửi đi trong quá trình hoạt động của mạng. Một số dạng tấn công có thể làm tăng số lượng gói tin điều khiển (chẳng hạn, tấn công phiên bản, tấn công DIS, và tấn công giảm Rank). Việc phòng chống tấn công được kỳ vọng sẽ làm giảm độ gia tăng này.
+    \item Mức tiêu thụ năng lượng: Một số thiết bị nhúng có thể có hai chế độ hoạt động: chế độ tiết kiệm năng lượng (Low-Power Mode) và chế độ hoạt động thông thường. Khi bị tấn công, tần suất và thời gian thiết bị phải ở trong trạng thái hoạt động tăng lên. Ngoài ra, thời gian hoạt động của bộ thu phát cũng tăng lên. Cả hai điều trên đều đồng nghĩa với tiêu thụ năng lượng nhiều hơn. Việc phòng chống tấn công được kỳ vọng sẽ đưa mức tiêu thụ năng lượng trở lại gần nhất có thể với mức tiêu thụ của mạng không bị tấn công.
+\end{itemize}
+
+\subsection{Kịch bản thực nghiệm}
+Nhóm thực hiện 10 kịch bản thực hiện, bao gồm kịch bản hoạt động bình thường, 4 kịch bản tấn công (DIS flooding, tấn công phiên bản, tấn công giảm Rank, và tấn công blackhole) cùng các kịch bản phòng chống tương ứng. Riêng với kịch bản tấn công blackhole, do đồ thị mạng khác biệt, nhóm cần thực hiện ba kịch bản, bao gồm bình thường, tấn công và phòng chống.
+
+Với các kịch bản tấn công DIS flooding, tấn công phiên bản, và tấn công giảm Rank, nhóm sử dụng mô hình mạng như hình, với nút tấn công (ID 8) nằm ở cuối đồ thị.
+
+Riêng với kịch bản tấn công blackhole, nhóm sử dụng mô hình mạng như hình, với nút tấn công (ID 8) nằm ở giữa đồ thị. Cách bố trí khác biệt này là do việc đặt nút tấn công ở cuối đồ thị đồng nghĩa với việc không có gói tin nào đi qua nó, dẫn đến việc không có tấn công nào xảy ra để đánh giá.
+
