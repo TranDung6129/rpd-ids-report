@@ -90,17 +90,20 @@
 \contentsline {subsection}{\numberline {5.4}Kết quả}{40}{subsection.5.4}%
 \contentsline {subsection}{\numberline {5.5}Phân tích tiêu thụ năng lượng}{42}{subsection.5.5}%
 \contentsline {subsubsection}{\numberline {5.5.1}DIS Flooding}{42}{subsubsection.5.5.1}%
-\contentsline {subsubsection}{\numberline {5.5.2}DAG Version Attack}{42}{subsubsection.5.5.2}%
-\contentsline {subsubsection}{\numberline {5.5.3}Blackhole Attack}{42}{subsubsection.5.5.3}%
-\contentsline {subsubsection}{\numberline {5.5.4}Decreased Rank Attack}{42}{subsubsection.5.5.4}%
-\contentsline {section}{\numberline {6}KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN}{44}{section.6}%
-\contentsline {section}{\hbox to\@tempdima {\hfil }TÀI LIỆU THAM KHẢO}{45}{section*.25}%
-\contentsline {section}{\hbox to\@tempdima {\hfil }PHỤ LỤC}{46}{section*.26}%
-\contentsline {section}{\numberline {A}Mã nguồn IDS (Contiki-NG)}{46}{section.1}%
-\contentsline {subsection}{\numberline {A.1}Module phát hiện DIS Flooding}{46}{subsection.1.1}%
-\contentsline {subsection}{\numberline {A.2}Module phát hiện Blackhole}{46}{subsection.1.2}%
-\contentsline {subsection}{\numberline {A.3}Module phát hiện Decreased Rank}{46}{subsection.1.3}%
-\contentsline {subsection}{\numberline {A.4}Module phát hiện VeRA / Version Number Attack}{47}{subsection.1.4}%
-\contentsline {section}{\numberline {B}Cấu hình mô phỏng Cooja}{48}{section.2}%
-\contentsline {subsection}{\numberline {B.1}Tham số mô phỏng}{48}{subsection.2.1}%
-\contentsline {subsection}{\numberline {B.2}Hướng dẫn chạy mô phỏng}{48}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {5.5.2}DAG Version Attack}{43}{subsubsection.5.5.2}%
+\contentsline {subsubsection}{\numberline {5.5.3}Blackhole Attack}{43}{subsubsection.5.5.3}%
+\contentsline {subsubsection}{\numberline {5.5.4}Decreased Rank Attack}{43}{subsubsection.5.5.4}%
+\contentsline {subsection}{\numberline {5.6}Tổng kết}{44}{subsection.5.6}%
+\contentsline {section}{\numberline {6}KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN}{45}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Kết luận}{45}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}Hướng phát triển}{45}{subsection.6.2}%
+\contentsline {section}{\hbox to\@tempdima {\hfil }TÀI LIỆU THAM KHẢO}{47}{section*.25}%
+\contentsline {section}{\hbox to\@tempdima {\hfil }PHỤ LỤC}{48}{section*.26}%
+\contentsline {section}{\numberline {A}Mã nguồn IDS (Contiki-NG)}{48}{section.1}%
+\contentsline {subsection}{\numberline {A.1}Module phát hiện DIS Flooding}{48}{subsection.1.1}%
+\contentsline {subsection}{\numberline {A.2}Module phát hiện Blackhole}{48}{subsection.1.2}%
+\contentsline {subsection}{\numberline {A.3}Module phát hiện Decreased Rank}{48}{subsection.1.3}%
+\contentsline {subsection}{\numberline {A.4}Module phát hiện VeRA / Version Number Attack}{49}{subsection.1.4}%
+\contentsline {section}{\numberline {B}Cấu hình mô phỏng Cooja}{50}{section.2}%
+\contentsline {subsection}{\numberline {B.1}Tham số mô phỏng}{50}{subsection.2.1}%
+\contentsline {subsection}{\numberline {B.2}Hướng dẫn chạy mô phỏng}{50}{subsection.2.2}%

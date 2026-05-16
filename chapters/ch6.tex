@@ -4,4 +4,17 @@
 \section{KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN}
 \label{sec:ch6}
 
-% TODO: Nội dung chương 6.
+Trong chương này, nhóm sẽ đưa ra kết luận về những điều đã đạt được trong quá trình thực nghiệm, đồng thời đưa ra những hướng phát triển tiếp theo dựa trên những kết quả đó.
+
+\subsection{Kết luận}
+Nhóm đã thực hiện một loạt các thí nghiệm để đánh giá hiệu quả của các biện pháp phòng chống tấn công DIS, tấn công phiên bản và tấn công giảm rank trong mạng RPL. Kết quả thu được cho thấy rằng các biện pháp phòng chống đã có tác động tích cực đến một số chỉ số quan trọng như tỉ lệ truyền dữ liệu thành công và chi phí gói tin điều khiển. Tuy nhiên, ở khía cạnh tiêu thụ năng lượng, kết quả lại không như mong đợi, khi mức tiêu thụ năng lượng sau khi triển khai biện pháp phòng chống lại còn cao hơn so với khi bị tấn công, và cả hai đều cao hơn so với mức bình thường. Điều này cho thấy rằng mặc dù các biện pháp phòng chống đã có hiệu quả trong việc giảm ảnh hưởng của các cuộc tấn công về mặt truyền dữ liệu và chi phí điều khiển, nhưng vẫn còn nhiều thách thức trong việc tối ưu hóa mức tiêu thụ năng lượng. Do thời gian thực nghiệm hạn chế, nhóm chưa thể xác định được nguyên nhân chính xác của việc tăng mức tiêu thụ năng lượng, có thể là do bản thân biện pháp phòng chống hoặc do cách tiếp cận của nhóm trong việc hiện thực hoá chưa chuẩn xác.
+
+Bên cạnh đó các biện pháp phòng chống được triển khai đơn lẻ cho từng loại tấn công, chưa có sự kết hợp giữa các biện pháp để tạo ra một hệ thống phòng chống toàn diện hơn. Tuy nhiên, việc triển khai kết hợp nhiều biện pháp có thể không thích hợp với các thiết bị IoT thực tế, vốn bị giới hạn về tài nguyên tính toán và tiêu thụ năng lượng. Do đó, việc tìm kiếm một giải pháp phòng chống hiệu quả và tối ưu hóa mức tiêu thụ năng lượng vẫn là một thách thức lớn đối với nhóm. Mặt khác, do các biện pháp phòng chống được triển khai trên các thiết bị mô phỏng, sự hạn chế và sai lệch trong khả năng mô phỏng quá trình tiêu thụ năng lượng của thiết bị trên Cooja cũng có thể là một yếu tố góp phần vào kết quả không như mong đợi về mức tiêu thụ năng lượng.
+
+\subsection{Hướng phát triển}
+Nếu có thể phát triển tiếp dự án này, nhóm đề xuất một số hướng phát triển sau đây:
+\begin{itemize}
+    \item Tìm ra nguyên nhân gốc rễ của việc tăng mức tiêu thụ năng lượng sau khi triển khai biện pháp phòng chống, từ đó có thể tối ưu hóa các biện pháp này để giảm thiểu tác động tiêu cực đến mức tiêu thụ năng lượng.
+    \item Cân nhắc mô phỏng trên các nền tảng sát với thiết bị thật hoặc triển khai trên phần cứng thực tế để có được kết quả chính xác hơn về mức tiêu thụ năng lượng và hiệu quả của các biện pháp phòng chống.
+    \item Nghiên cứu và phát triển các biện pháp phòng chống kết hợp, có thể cân nhắc xây dựng IDS trên thiết bị vật lý riêng, tách biệt với các thiết bị IoT, để giảm tải cho các thiết bị này và tối ưu hóa mức tiêu thụ năng lượng.
+\end{itemize}

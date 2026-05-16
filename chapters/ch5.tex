@@ -123,6 +123,8 @@ Bảng \ref{tab:pdr_detailed} tổng hợp kết quả về tỉ lệ truyền d
 \subsection{Phân tích tiêu thụ năng lượng}
 
 \subsubsection{DIS Flooding}
+Mức hoạt động của CPU khi được triển khai biện pháp phòng chống nhỉnh hơn so với khi bị tấn công trong nửa đầu của khoảng thời gian đo, nhưng sau đó giảm xuống đáng kể. Bình quân số chu kỳ CPU hoạt động trong mỗi phút giảm từ khoảng 2175681 xuống còn 2117457, nhưng vẫn còn cách xa so với mức bình thường là 1762157. Với số chu kỳ của radio, việc phòng chống đã giảm số này từ 59876622 xuống còn 59678654, nhưng con số này ở gần giá trị khi bị tấn công hơn so với giá trị bình thường (58959914). Như vậy biện pháp phòng chống vẫn chưa tối ưu được mức tiêu thụ năng lượng, dù đã có hiệu quả ở các tiêu chí khác.
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.48\textwidth]{Figures/energy-usage/energy_plot_disflood_cpu.png}
@@ -133,6 +135,10 @@ Bảng \ref{tab:pdr_detailed} tổng hợp kết quả về tỉ lệ truyền d
 \end{figure}
 
 \subsubsection{DAG Version Attack}
+Ngược lại với sự tăng mức tiêu thụ CPU trong kịch bản tấn công DIS, kịch bản tấn công phiên bản lại làm giảm mức tiêu thụ CPU, nhưng lại làm tăng mức tiêu thụ radio. Sự giảm mức tiêu thụ CPU có thể là do việc tấn công phiên bản liên tục khiến các nút bị lỗi phiên bản đồ thị mạng và không thể thực hiện các tác vụ bình thường, dẫn đến việc giảm mức tiêu thụ CPU. Điều tương tự cũng xảy ra với mức tiêu thụ radio. Việc phòng chống nâng mức tiêu thụ CPU từ 1217386 lên 1513039, một khoảng cách đáng kể, và gần với giá trị 1762157 hơn so với khi bị tấn công. Tuy nhiên, nhìn vào đồ thị, lại có thể thấy mức tiêu thụ CPU khi được triển khai biện pháp phòng chống lại có một khoảng tụt xuống gần với mức khi bị tấn công, cụ thể là trong giai đoạn từ 14 đến 26 phút. Với giá trị tiêu thụ Radio, việc phòng chống cho thấy kết quả khả quan hơn, khi đã nâng mức tiêu thụ trung bình từ 56488806 lên 58640745, rất gần với mức bình thường 58959914. Cho thấy phương pháp hash phiên bản đã có hiệu quả trong việc giảm ảnh hưởng đến mức tiêu thụ năng lượng.
+
+Mặc dù một đã có những nghiên cứu cho rằng việc tấn công phiên bản có thể làm tăng mức tiêu thụ năng lượng, kết quả thực nghiệm của nhóm đang cho thấy điều ngược lại. Tuy nhiên, dù mức tiêu thụ năng lượng giảm, ảnh hưởng tiêu cực của tấn công phiên bản, cũng như độ hiệu quả của giải pháp, vẫn rất rõ ràng ở khía cạnh tỉ lệ truyền dữ liệu thành công và chi phí điều khiển RPL.
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.48\textwidth]{Figures/energy-usage/energy_plot_dagver_cpu.png}
@@ -143,6 +149,8 @@ Bảng \ref{tab:pdr_detailed} tổng hợp kết quả về tỉ lệ truyền d
 \end{figure}
 
 \subsubsection{Blackhole Attack}
+
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.48\textwidth]{Figures/energy-usage/energy_plot_blackhole_cpu.png}
@@ -153,6 +161,8 @@ Bảng \ref{tab:pdr_detailed} tổng hợp kết quả về tỉ lệ truyền d
 \end{figure}
 
 \subsubsection{Decreased Rank Attack}
+Mức tiêu thụ CPU sau khi triển khai biện pháp phòng chống lại tăng gần như đột biến, cho giá trị trung bình 3272003, cao hơn cả giá trị khi bị tấn công (3066664), vốn đã cao hơn gần 2 lần so với mức bình thường (1762156). Mức hoạt động Radio còn cho thấy kết quả khó đánh giá hơn khi liên tục dao động. Giá trị hoạt động trung bình của radio (59446677 chu kỳ/phút) sau khi triển khai biện pháp phòng chống lại còn cao hơn so với khi bị tấn công (59297215 chu kỳ/phút), và cả hai đều cao hơn so với mức bình thường (58959914 chu kỳ/phút). Như vậy, biện pháp phòng chống đã không có hiệu quả trong việc giảm mức tiêu thụ năng lượng, mà thậm chí còn làm tăng mức tiêu thụ năng lượng lên đáng kể.
+
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.48\textwidth]{Figures/energy-usage/energy_plot_decrank_cpu.png}
@@ -162,5 +172,5 @@ Bảng \ref{tab:pdr_detailed} tổng hợp kết quả về tỉ lệ truyền d
     \label{fig:energy_decrank}
 \end{figure}
 
-
-
+\subsection{Tổng kết}
+Trong chương này, nhóm đã trình bày quá trình thực nghiệm và kết quả đánh giá thu được từ quá trình đó. Các biện pháp phòng chống nhìn chung đã có tác động tích cực đến một số chỉ số (tỉ lệ truyền thành công, chi phí gói tin điều khiển), nhưng lại chưa đủ hiệu quả trong việc giảm mức tiêu thụ năng lượng, thậm chí còn làm tăng mức tiêu thụ năng lượng lên đáng kể trong một số kịch bản. Với thời gian thực nghiệm hạn chế, nhóm chưa thể xác định được nguyên nhân là do bản thân biện pháp phòng chống hay do hướng tiếp cận của nhóm trong việc hiện thực hoá chưa chuẩn xác.
