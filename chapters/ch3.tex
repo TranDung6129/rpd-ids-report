@@ -115,6 +115,13 @@ Tấn công diễn ra theo hai giai đoạn:
           không nhận được xác nhận, dẫn đến mất gói hàng loạt.
 \end{enumerate}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{Figures/attacks/Blackhole.png}
+    \caption{Cơ chế Blackhole Attack: kẻ tấn công A thu hút lưu lượng từ các nút lân cận (B, C) rồi hủy gói tin thay vì chuyển tiếp}
+    \label{fig:blackhole}
+\end{figure}
+
 Khi vị trí kẻ tấn công được chọn khéo léo (gần nút gốc), nó có thể cô
 lập hoàn toàn một nhánh mạng. Một biến thể nguy hiểm hơn là
 \textbf{Selective Forwarding (Greyhole)}: nút độc hại chỉ hủy một tỉ lệ
@@ -177,6 +184,14 @@ parent. Hệ quả:
       \item Với OF0, tấn công đặc biệt hiệu quả vì OF0 không có cơ chế
             hysteresis --- nút luôn chọn parent có Rank thấp nhất.
 \end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{Figures/attacks/Decreased_Rank.png}
+    \caption{Cơ chế Decreased Rank Attack: kẻ tấn công A quảng bá Rank thấp, thu hút các nút lân cận (B, C) chọn nó làm parent.
+                  Nếu A kết hợp với Blackhole, các gói tin từ B, C sẽ bị hủy}
+      \label{fig:decreased_rank}
+\end{figure}
 
 Một kết quả quan trọng từ \cite{decrank2022}: tấn công đặt kẻ tấn công
 1--2 hop từ nút gốc có thể \textbf{không gây tác động trực tiếp} nhưng
@@ -246,8 +261,14 @@ DODAGVersionNumber cao hơn hiện tại. Kết quả: toàn mạng tái cấu t
 kẻ tấn công lặp lại liên tục, mạng không bao giờ ổn định được.
 
 Kết hợp với tấn công này, kẻ tấn công còn có thể quảng bá Rank thấp
-(Decreased Rank) trong DIO giả, trở thành nút trung gian chiếm lưu lượng
-eavesdrop toàn bộ mạng.
+(Decreased Rank) trong DIO giả, trở thành nút trung gian chiếm lưu lượng eavesdrop toàn bộ mạng.
+
+\begin{figure}
+      \centering
+      \includegraphics[width=0.75\textwidth]{Figures/attacks/DAG_version.png}
+      \caption{Cơ chế Version Number Attack: kẻ tấn công A giả mạo nút gốc bằng cách phát DIO với DODAGVersionNumber cao hơn, buộc toàn mạng tái cấu trúc}
+      \label{fig:version_attack}
+\end{figure}
 
 \subsubsection{Tác động đến hiệu năng mạng}
 

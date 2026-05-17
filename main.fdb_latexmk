@@ -1,13 +1,13 @@
 # Fdb version 4
-["bibtex main"] 1778980975.91167 "main.aux" "main.bbl" "main" 1778980980.78534 0
+["bibtex main"] 1778981961.69904 "main.aux" "main.bbl" "main" 1778981966.40344 0
   "./References.bib" 1778860881 2804 65031e7e228eda1813668b15de3a0892 ""
   "C:/Users/Long Long/AppData/Local/Programs/MiKTeX/bibtex/bst/ieeetran/IEEEtran.bst" 1440622569 57748 7c8250ecf02814ce6ddc0cdbb63df1dd ""
-  "main.aux" 1778980979 24000 eb8eab4e5cdf2b7556b7734a504be432 "pdflatex"
+  "main.aux" 1778981965 25618 6d9cac0ccca576f84447bd0786d7d6b3 "pdflatex"
   (generated)
   "main.bbl"
   "main.blg"
   (rewritten before read)
-["pdflatex"] 1778980976.43623 "d:/Working/Programming/hust/atttiot/latex/rpd-ids-report/main.tex" "main.pdf" "main" 1778980980.78603 0
+["pdflatex"] 1778981962.0994 "d:/Working/Programming/hust/atttiot/latex/rpd-ids-report/main.tex" "main.pdf" "main" 1778981966.40413 0
   "C:/Users/Long Long/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map" 1778862816 89969 e95579120a3aa0ebc21d2737ca2ba701 ""
   "C:/Users/Long Long/AppData/Local/MiKTeX/fonts/tfm/public/rsfs/rsfs10.tfm" 1778862819 688 37338d6ab346c2f1466b29e195316aa4 ""
   "C:/Users/Long Long/AppData/Local/MiKTeX/miktex/data/le/pdftex/pdflatex.fmt" 1768742164 13335500 8da48e283b5c8724f65412d91f96d30d ""
@@ -273,7 +273,10 @@
   "C:/Users/Long Long/AppData/Local/Programs/MiKTeX/tex/latex/vntex/t5ptm.fd" 1368738347 1100 803888e7a6edcd8c143317c75deceb08 ""
   "C:/Users/Long Long/AppData/Local/Programs/MiKTeX/tex/latex/xcolor/xcolor.sty" 1729265222 55384 b454dec21c2d9f45ec0b793f0995b992 ""
   "C:/Users/Long Long/AppData/Local/Programs/MiKTeX/tex/latex/xkeyval/xkeyval.sty" 1656236919 4937 4ce600ce9bd4ec84d0250eb6892fcf4f ""
+  "Figures/attacks/Blackhole.png" 1778979794 30064 71a5519481c201f83224241f8d393eca ""
+  "Figures/attacks/DAG_version.png" 1778979771 30728 81c3802af116dff8d4794159a368dafd ""
   "Figures/attacks/DIS_Flooding.png" 1778979756 26492 7f4dbfccc300b313d033f8f31c6a0ab4 ""
+  "Figures/attacks/Decreased_Rank.png" 1778979783 29306 9994e100c4cd7025ca51f38a96d90a12 ""
   "Figures/energy-usage/energy_plot_blackhole_cpu.png" 1778860917 88472 1633a91e69fc17117449dbe519d61d7e ""
   "Figures/energy-usage/energy_plot_blackhole_radio_total.png" 1778860917 135878 db992b0e5588bf22e9111183d81c2239 ""
   "Figures/energy-usage/energy_plot_dagver_cpu.png" 1778860917 110594 ad2122fda7f20460bd215ecc0550e478 ""
@@ -286,7 +289,7 @@
   "backmatter/appendix.tex" 1778860881 3889 0f612b3befd9d92ae36d30b87bc57b82 ""
   "chapters/ch1.tex" 1778860881 13956 26b35de14cdb1d9d20553611eeccb51a ""
   "chapters/ch2.tex" 1778860881 20638 bf5096115fab46080960d022b003d899 ""
-  "chapters/ch3.tex" 1778980975 18586 b0e10c394504c1afba19e38ea22c3191 ""
+  "chapters/ch3.tex" 1778981956 19666 b697a165cd82ad01f2b6b36cee2deba1 ""
   "chapters/ch4.tex" 1778925507 31141 205495c9912d9d990c47ce0930d0252b ""
   "chapters/ch5.tex" 1778951658 17533 04b5811c33debaecb2bbd5710cad8278 ""
   "chapters/ch6.tex" 1778952345 3997 d1404af498a3cbe2c27ddacc205520f3 ""
@@ -296,13 +299,13 @@
   "frontmatter/cover.tex" 1778860881 2068 c927fa56ac6d8edf28273c301a53e433 ""
   "frontmatter/pledge.tex" 1778860881 1391 b833c39f2085f7f3010d89a40f36ddb9 ""
   "frontmatter/preface.tex" 1778860881 2489 0d4f398a907209f04210dabe48827614 ""
-  "main.aux" 1778980979 24000 eb8eab4e5cdf2b7556b7734a504be432 "pdflatex"
-  "main.bbl" 1778980976 2618 f81c2cc6f2c150be217ebf161ec488eb "bibtex main"
-  "main.lof" 1778980979 847 d401fb8f6b84d29d919724b4cce2bf50 "pdflatex"
-  "main.lot" 1778980979 925 151e168c295a402a2c86a0ebc2f402ea "pdflatex"
-  "main.out" 1778980979 17231 82ede03d8b24d8050b0c4bc9c641ea36 "pdflatex"
+  "main.aux" 1778981965 25618 6d9cac0ccca576f84447bd0786d7d6b3 "pdflatex"
+  "main.bbl" 1778981962 2618 f81c2cc6f2c150be217ebf161ec488eb "bibtex main"
+  "main.lof" 1778981965 1624 7c1a13ad7dee4b5e5b377809ddfcd177 "pdflatex"
+  "main.lot" 1778981965 925 8c4487489f5c406c11725e389c0236c3 "pdflatex"
+  "main.out" 1778981965 17231 3d4a4a7a60553dc1f9913749ab8659fe "pdflatex"
   "main.tex" 1778933912 6236 7afdf9a5d3c7592dd2d52172c3913f83 ""
-  "main.toc" 1778980979 10496 88a47cd0c192496906f6427f9960420d "pdflatex"
+  "main.toc" 1778981965 10496 09f4f2abc53e93294f95206f3dcffda4 "pdflatex"
   (generated)
   "main.aux"
   "main.lof"
