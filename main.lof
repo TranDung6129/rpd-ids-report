@@ -1,5 +1,8 @@
 \contentsline {figure}{\numberline {3.1}{\ignorespaces Cơ chế DIS Flooding Attack: kẻ tấn công A liên tục phát DIS, buộc các nút lân cận reset Trickle Timer và phát DIO}}{14}{figure.caption.14}%
-\contentsline {figure}{\numberline {5.2}{\ignorespaces Tiêu thụ năng lượng DIS Flooding: CPU (trái) và Radio (phải)}}{42}{figure.caption.21}%
-\contentsline {figure}{\numberline {5.3}{\ignorespaces Tiêu thụ năng lượng DAG Version Attack: CPU (trái) và Radio (phải)}}{43}{figure.caption.22}%
-\contentsline {figure}{\numberline {5.4}{\ignorespaces Tiêu thụ năng lượng Blackhole Attack: CPU (trái) và Radio (phải)}}{44}{figure.caption.23}%
-\contentsline {figure}{\numberline {5.5}{\ignorespaces Tiêu thụ năng lượng Decreased Rank Attack: CPU (trái) và Radio (phải)}}{44}{figure.caption.24}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Cơ chế Blackhole Attack: kẻ tấn công A thu hút lưu lượng từ các nút lân cận (B, C) rồi hủy gói tin thay vì chuyển tiếp}}{16}{figure.caption.15}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Cơ chế Decreased Rank Attack: kẻ tấn công A quảng bá Rank thấp, thu hút các nút lân cận (B, C) chọn nó làm parent. Nếu A kết hợp với Blackhole, các gói tin từ B, C sẽ bị hủy}}{17}{figure.caption.16}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Cơ chế Version Number Attack: kẻ tấn công A giả mạo nút gốc bằng cách phát DIO với DODAGVersionNumber cao hơn, buộc toàn mạng tái cấu trúc}}{19}{figure.caption.17}%
+\contentsline {figure}{\numberline {5.5}{\ignorespaces Tiêu thụ năng lượng DIS Flooding: CPU (trái) và Radio (phải)}}{43}{figure.caption.24}%
+\contentsline {figure}{\numberline {5.6}{\ignorespaces Tiêu thụ năng lượng DAG Version Attack: CPU (trái) và Radio (phải)}}{44}{figure.caption.25}%
+\contentsline {figure}{\numberline {5.7}{\ignorespaces Tiêu thụ năng lượng Blackhole Attack: CPU (trái) và Radio (phải)}}{45}{figure.caption.26}%
+\contentsline {figure}{\numberline {5.8}{\ignorespaces Tiêu thụ năng lượng Decreased Rank Attack: CPU (trái) và Radio (phải)}}{45}{figure.caption.27}%
