@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.18)  17 MAY 2026 00:25
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.1.18)  17 MAY 2026 08:22
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -1033,7 +1033,11 @@ File: t5utm.fd 2005/08/24 Fontinst v1.929 font definitions for T5/ptm.
 ) (C:\Users\Long Long\AppData\Local\Programs\MiKTeX\tex/latex/l3backend\l3backend-pdftex.def
 File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count411
-) (main.aux)
+) (main.aux
+
+LaTeX Warning: Label `eq:pdr' multiply defined.
+
+)
 \openout1 = `main.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 133.
@@ -1289,38 +1293,44 @@ pdfTeX warning (ext4): destination with the same identifier (name{page.13}) has 
                    \relax 
 l.185 \clearpage
                  [13] (chapters/ch3.tex
+<Figures/attacks/DIS_Flooding.png, id=685, 348.55219pt x 127.22531pt>
+File: Figures/attacks/DIS_Flooding.png Graphic file (type png)
+<use Figures/attacks/DIS_Flooding.png>
+Package pdftex.def Info: Figures/attacks/DIS_Flooding.png  used on input line 39.
+(pdftex.def)             Requested size: 341.43307pt x 124.63335pt.
+
 pdfTeX warning (ext4): destination with the same identifier (name{page.14}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.64 \end{enumerate}
-                     [14
+l.57 
+      [14
 
-]
+ <./Figures/attacks/DIS_Flooding.png>]
 pdfTeX warning (ext4): destination with the same identifier (name{page.15}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.124 
-       [15]
+l.116 \end{enumerate}
+                      [15]
 
-LaTeX Warning: Citation `decrank2022' on page 16 undefined on input line 173.
+LaTeX Warning: Citation `decrank2022' on page 16 undefined on input line 164.
 
 
 pdfTeX warning (ext4): destination with the same identifier (name{page.16}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.181     \item N
-                 hiều nút cập nhật preferred parent về phía kẻ t... [16]
+l.170 
+       [16]
 
-LaTeX Warning: Citation `decrank2022' on page 17 undefined on input line 190.
-
-
-LaTeX Warning: Citation `decrank2022' on page 17 undefined on input line 203.
+LaTeX Warning: Citation `decrank2022' on page 17 undefined on input line 181.
 
 
-LaTeX Warning: Citation `decrank2022' on page 17 undefined on input line 228.
+LaTeX Warning: Citation `decrank2022' on page 17 undefined on input line 194.
+
+
+LaTeX Warning: Citation `decrank2022' on page 17 undefined on input line 219.
 
 [17] [18]
-Underfull \hbox (badness 10000) in alignment at lines 371--371
+Underfull \hbox (badness 10000) in alignment at lines 362--362
 [][][][][] 
  []
 
@@ -1378,33 +1388,33 @@ Overfull \hbox (1.74585pt too wide) in paragraph at lines 20--21
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [40] [41]
-<Figures/energy-usage/energy_plot_disflood_cpu.png, id=852, 867.24pt x 433.62pt>
+<Figures/energy-usage/energy_plot_disflood_cpu.png, id=854, 867.24pt x 433.62pt>
 File: Figures/energy-usage/energy_plot_disflood_cpu.png Graphic file (type png)
 <use Figures/energy-usage/energy_plot_disflood_cpu.png>
 Package pdftex.def Info: Figures/energy-usage/energy_plot_disflood_cpu.png  used on input line 130.
 (pdftex.def)             Requested size: 218.51521pt x 109.25163pt.
-<Figures/energy-usage/energy_plot_disflood_radio_total.png, id=853, 867.24pt x 433.62pt>
+<Figures/energy-usage/energy_plot_disflood_radio_total.png, id=855, 867.24pt x 433.62pt>
 File: Figures/energy-usage/energy_plot_disflood_radio_total.png Graphic file (type png)
 <use Figures/energy-usage/energy_plot_disflood_radio_total.png>
 Package pdftex.def Info: Figures/energy-usage/energy_plot_disflood_radio_total.png  used on input line 132.
 (pdftex.def)             Requested size: 218.51521pt x 109.25163pt.
  [42 <./Figures/energy-usage/energy_plot_disflood_cpu.png> <./Figures/energy-usage/energy_plot_disflood_radio_total.png>]
-<Figures/energy-usage/energy_plot_dagver_cpu.png, id=860, 867.24pt x 433.62pt>
+<Figures/energy-usage/energy_plot_dagver_cpu.png, id=862, 867.24pt x 433.62pt>
 File: Figures/energy-usage/energy_plot_dagver_cpu.png Graphic file (type png)
 <use Figures/energy-usage/energy_plot_dagver_cpu.png>
 Package pdftex.def Info: Figures/energy-usage/energy_plot_dagver_cpu.png  used on input line 144.
 (pdftex.def)             Requested size: 218.51521pt x 109.25163pt.
-<Figures/energy-usage/energy_plot_dagver_radio_total.png, id=861, 867.24pt x 433.62pt>
+<Figures/energy-usage/energy_plot_dagver_radio_total.png, id=863, 867.24pt x 433.62pt>
 File: Figures/energy-usage/energy_plot_dagver_radio_total.png Graphic file (type png)
 <use Figures/energy-usage/energy_plot_dagver_radio_total.png>
 Package pdftex.def Info: Figures/energy-usage/energy_plot_dagver_radio_total.png  used on input line 146.
 (pdftex.def)             Requested size: 218.51521pt x 109.25163pt.
-<Figures/energy-usage/energy_plot_blackhole_cpu.png, id=862, 867.24pt x 433.62pt>
+<Figures/energy-usage/energy_plot_blackhole_cpu.png, id=864, 867.24pt x 433.62pt>
 File: Figures/energy-usage/energy_plot_blackhole_cpu.png Graphic file (type png)
 <use Figures/energy-usage/energy_plot_blackhole_cpu.png>
 Package pdftex.def Info: Figures/energy-usage/energy_plot_blackhole_cpu.png  used on input line 156.
 (pdftex.def)             Requested size: 218.51521pt x 109.25163pt.
-<Figures/energy-usage/energy_plot_blackhole_radio_total.png, id=863, 867.24pt x 433.62pt>
+<Figures/energy-usage/energy_plot_blackhole_radio_total.png, id=865, 867.24pt x 433.62pt>
 File: Figures/energy-usage/energy_plot_blackhole_radio_total.png Graphic file (type png)
 <use Figures/energy-usage/energy_plot_blackhole_radio_total.png>
 Package pdftex.def Info: Figures/energy-usage/energy_plot_blackhole_radio_total.png  used on input line 158.
@@ -1414,12 +1424,12 @@ Package pdftex.def Info: Figures/energy-usage/energy_plot_blackhole_radio_total.
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 [43 <./Figures/energy-usage/energy_plot_dagver_cpu.png> <./Figures/energy-usage/energy_plot_dagver_radio_total.png>]
-<Figures/energy-usage/energy_plot_decrank_cpu.png, id=870, 867.24pt x 433.62pt>
+<Figures/energy-usage/energy_plot_decrank_cpu.png, id=872, 867.24pt x 433.62pt>
 File: Figures/energy-usage/energy_plot_decrank_cpu.png Graphic file (type png)
 <use Figures/energy-usage/energy_plot_decrank_cpu.png>
 Package pdftex.def Info: Figures/energy-usage/energy_plot_decrank_cpu.png  used on input line 168.
 (pdftex.def)             Requested size: 218.51521pt x 109.25163pt.
-<Figures/energy-usage/energy_plot_decrank_radio_total.png, id=871, 867.24pt x 433.62pt>
+<Figures/energy-usage/energy_plot_decrank_radio_total.png, id=873, 867.24pt x 433.62pt>
 File: Figures/energy-usage/energy_plot_decrank_radio_total.png Graphic file (type png)
 <use Figures/energy-usage/energy_plot_decrank_radio_total.png>
 Package pdftex.def Info: Figures/energy-usage/energy_plot_decrank_radio_total.png  used on input line 170.
@@ -1490,21 +1500,24 @@ L3 programming layer <2025-12-29>
 
 LaTeX Warning: There were undefined references.
 
+
+LaTeX Warning: There were multiply-defined labels.
+
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 013C47E08883BF4CE714997311F0502D;17272.
+(rerunfilecheck)             Checksum: 82EDE03D8B24D8050B0C4BC9C641EA36;17231.
  ) 
 Here is how much of TeX's memory you used:
- 40079 strings out of 467870
- 892451 string characters out of 5416383
- 1719157 words of memory out of 5000000
- 67945 multiletter control sequences out of 15000+600000
+ 40085 strings out of 467870
+ 892715 string characters out of 5416383
+ 1719197 words of memory out of 5000000
+ 67951 multiletter control sequences out of 15000+600000
  698693 words of font info for 134 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  108i,14n,107p,1498b,2100s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/Long Long/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Long Long/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Users/Long Long/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Long Long/AppData/Local/Programs/MiKTeX/fonts/type1/urw/symbol/usyr.pfb><C:/Users/Long Long/AppData/Local/Programs/MiKTeX/fonts/type1/vntex/urwvn/utmb8v.pfb><C:/Users/Long Long/AppData/Local/Programs/MiKTeX/fonts/type1/vntex/urwvn/utmbi8v.pfb><C:/Users/Long Long/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/Long Long/AppData/Local/Programs/MiKTeX/fonts/type1/vntex/urwvn/utmr8v.pfb><C:/Users/Long Long/AppData/Local/Programs/MiKTeX/fonts/type1/urw/times/utmri8a.pfb><C:/Users/Long Long/AppData/Local/Programs/MiKTeX/fonts/type1/vntex/urwvn/utmri8v.pfb><C:/Users/Long Long/AppData/Local/Programs/MiKTeX/fonts/type1/vntex/vnr/vnitt10.pfb><C:/Users/Long Long/AppData/Local/Programs/MiKTeX/fonts/type1/vntex/vnr/vntt12.pfb>
-Output written on main.pdf (66 pages, 1133157 bytes).
+Output written on main.pdf (66 pages, 1157159 bytes).
 PDF statistics:
- 1078 PDF objects out of 1200 (max. 8388607)
+ 1080 PDF objects out of 1200 (max. 8388607)
  284 named destinations out of 1000 (max. 500000)
- 818 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 823 words of extra memory for PDF output out of 10000 (max. 10000000)
 

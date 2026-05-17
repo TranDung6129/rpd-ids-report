@@ -22,21 +22,21 @@ thác thiết kế của bản tin \textbf{DIS} và cơ chế \textbf{Trickle Ti
 trong RPL \cite{prajisha2025dis}.
 
 Trong hoạt động bình thường, một nút hợp lệ chỉ gửi DIS khi: (i)~không
-nhận được DIO trong khoảng thời gian quy định (mặc định 60 giây trên
+nhận được DIO trong khoảng thời gian quy định (mặc định 30 giây trên
 Contiki-NG), (ii)~nút cha hiện tại bị hỏng, hoặc (iii)~phát hiện routing
 inconsistency. Khi nhận DIS, mọi nút hàng xóm đang là thành viên DODAG
 phải ngay lập tức \textbf{reset Trickle Timer} về $I_{min}$ và phát
 DIO --- thay vì chờ hết chu kỳ hiện tại (có thể lên đến $I_{max}$).
 
 Kẻ tấn công khai thác quy trình này bằng cách phát DIS liên tục với
-tần suất cao (1--2 giây/lần, so với 60 giây bình thường). Kết quả là
+tần suất rất cao (100 lần/giây, so với 30 giây/lần bình thường). Kết quả là
 tất cả các nút trong phạm vi thu phát của kẻ tấn công liên tục reset
 Trickle Timer và phát DIO, gây \textbf{bùng nổ bản tin điều khiển}
 trên toàn mạng. Hình~\ref{fig:dis_flooding} minh họa cơ chế này.
 
 \begin{figure}[H]
     \centering
-    % \includegraphics[width=0.75\textwidth]{Figures/ch3/dis_flooding.png}
+    \includegraphics[width=0.75\textwidth]{Figures/attacks/DIS_Flooding.png}
     \caption{Cơ chế DIS Flooding Attack: kẻ tấn công A liên tục phát
              DIS, buộc các nút lân cận reset Trickle Timer và phát DIO}
     \label{fig:dis_flooding}
@@ -73,9 +73,7 @@ DIS Flooding gây ra bốn tác động tiêu cực chính:
               \text{DTL} = \frac{N_{\text{DIS}}}{N_{\text{total}}}
               \label{eq:dtl}
           \end{equation}
-    \item Tần suất thay đổi preferred parent tăng cao (do Trickle Timer
-          reset liên tục làm mạng mất ổn định).
-    \item Tổng số bản tin DIO tăng đột biến trong cửa sổ quan sát.
+    \item Tổng số bản tin DIO tăng đột biến trong phạm vi quan sát.
 \end{itemize}
 
 \subsubsection{Phòng chống}
@@ -109,7 +107,7 @@ Tấn công diễn ra theo hai giai đoạn:
     \item \textbf{Giai đoạn thu hút (Attraction):} Nút tấn công quảng
           bá DIO với Rank thấp và/hoặc ETX thấp giả tạo, khiến nhiều nút
           lân cận chọn nó làm preferred parent. Đây thực chất là kết hợp
-          với Sinkhole Attack.
+          với Sinkhole Attack hoặc Decreased Rank Attack.
 
     \item \textbf{Giai đoạn hủy gói (Dropping):} Sau khi thu hút được
           lưu lượng, nút tấn công âm thầm loại bỏ \textbf{toàn bộ} gói
@@ -143,24 +141,17 @@ gói (không phải 100\%), khó phát hiện hơn.
 \subsubsection{Dấu hiệu nhận biết}
 
 \begin{itemize}
-    \item PDR từ các nút cụ thể giảm đột ngột xuống gần 0.
-    \item Tỉ lệ phản hồi (Response Receipt Rate -- RRR) từ một nút cha
-          giảm mạnh:
+    \item Tỉ lệ gửi gói thành công (Packet Delivery Ratio) trên toàn mạng giảm mạnh, trong đó các gói tin dữ liệu từ nút nạn nhân có PDR giảm xuống gần 0.
           \begin{equation}
-              \text{RRR} = \frac{N_{\text{response}}}{N_{\text{request}}}
-              \label{eq:rrr}
+              \text{PDR} = \frac{N_{\text{send}}}{N_{\text{receive}}}
+              \label{eq:pdr}
           \end{equation}
-    \item Nhiều bản tin DAO không nhận được DAO-ACK từ parent nghi ngờ.
-    \item Số lần route repair tăng cao ở các nút downstream của kẻ tấn công.
 \end{itemize}
 
 \subsubsection{Phòng chống}
 
-Giải pháp \textbf{phân tán dựa trên bộ hẹn giờ} \cite{sharma2022blackhole}:
-Mỗi nút giám sát tỉ lệ phản hồi của parent hiện tại thông qua timer.
-Nếu RRR giảm dưới ngưỡng trong một cửa sổ thời gian, nút đó bị đánh
-dấu nghi ngờ và thông báo tới toàn mạng qua broadcast. Giải pháp này
-đạt TPR lên tới 100\% trên mạng 16 nút lossless.
+Giải pháp \textbf{phân tán dựa trên các bản tin yêu cầu và xác nhận} \cite{sharma2022blackhole}:
+Mỗi nút nghe các gói tin đi ra từ nút cha của nó. Sau một khoảng thời gian nhất định, nếu không có gói tin nào, nó sẽ gửi yêu cầu xác nhận đến các nút lân cận. Các nút lân cận sẽ gửi yêu cầu đến nút bị nghi ngờ. Nếu nút nghi ngờ không phản hồi, nó sẽ bị đánh dấu là blackhole và nút con sẽ tìm nút cha khác.
 
 % ============================================================
 \subsection{Decreased Rank Attack}
@@ -178,13 +169,13 @@ Objective Function, ưu tiên chọn nút có Rank thấp nhất làm preferred
 parent. Hệ quả:
 
 \begin{itemize}
-    \item Nhiều nút cập nhật preferred parent về phía kẻ tấn công.
-    \item Cấu trúc DODAG bị méo: một nhánh cây lớn phụ thuộc vào nút
-          độc hại.
-    \item Kẻ tấn công kiểm soát luồng dữ liệu của các nút nạn nhân,
-          tạo điều kiện thực hiện Blackhole hoặc eavesdropping.
-    \item Với OF0, tấn công đặc biệt hiệu quả vì OF0 không có cơ chế
-          hysteresis --- nút luôn chọn parent có Rank thấp nhất.
+      \item Nhiều nút cập nhật preferred parent về phía kẻ tấn công.
+      \item Cấu trúc DODAG bị méo: một nhánh cây lớn phụ thuộc vào nút
+            độc hại.
+      \item Kẻ tấn công kiểm soát luồng dữ liệu của các nút nạn nhân,
+            tạo điều kiện thực hiện Blackhole hoặc eavesdropping.
+      \item Với OF0, tấn công đặc biệt hiệu quả vì OF0 không có cơ chế
+            hysteresis --- nút luôn chọn parent có Rank thấp nhất.
 \end{itemize}
 
 Một kết quả quan trọng từ \cite{decrank2022}: tấn công đặt kẻ tấn công
@@ -196,7 +187,7 @@ network profiling khó phát hiện.
 
 \begin{enumerate}
     \item \textbf{Tạo vòng lặp (Routing Loop):} Cấu trúc DODAG không
-          hợp lệ dẫn đến vòng lặp định tuyến, nút phải công bố Rank
+          hợp lệ dẫn đến vòng lặp định tuyến, đặc biệt là khi nút tấn công nhận một nạn nhân của nó là nút cha. Nút nạn nhân phải công bố Rank
           vô cực để thoát, reset Trickle Timer liên tục.
 
     \item \textbf{Giảm PDR:} Khi kẻ tấn công kết hợp với Blackhole hoặc
@@ -227,18 +218,18 @@ network profiling khó phát hiện.
 
 \textbf{Secure Objective Function (Sec-OF)} \cite{decrank2022}: Kết hợp
 xác thực Rank dựa trên hop count --- nút chỉ chấp nhận parent nếu
-Rank quảng bá nhất quán với khoảng cách hop thực tế. Đồng thời có thể
-kết hợp VeRA \cite{dvir2011vera} để xác thực cả Rank lẫn Version Number.
+Rank quảng bá nhất quán với khoảng cách hop thực tế. Đồng thời có thể cân nhắc
+kết hợp chuỗi hash rank trong VeRA \cite{dvir2011vera} để xác thực cả Rank lẫn Version Number.
 Sec-OF đưa tiêu thụ điện về mức 0.98--1.19\,mW, gần với mức baseline.
 
 % ============================================================
-\subsection{VeRA / DODAG Version Number Attack}
+\subsection{Tấn công phiên bản DODAG}
 \label{subsec:vera}
 % ============================================================
 
 \subsubsection{Cơ chế tấn công}
 
-VeRA/DODAG Version Number Attack thuộc nhóm \textit{Resources -- Indirect},
+Tấn công phiên bản DODAG thuộc nhóm \textit{Resources -- Indirect},
 khai thác cơ chế \textbf{DODAGVersionNumber} trong RPL \cite{dvir2011vera}.
 
 Trong RPL, chỉ nút gốc có quyền tăng DODAGVersionNumber để khởi tạo

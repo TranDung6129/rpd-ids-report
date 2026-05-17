@@ -63,14 +63,14 @@
 \contentsline {subsubsection}{\numberline {3.3.1}Cơ chế tấn công}{16}{subsubsection.3.3.1}%
 \contentsline {subsubsection}{\numberline {3.3.2}Tác động đến hiệu năng mạng}{17}{subsubsection.3.3.2}%
 \contentsline {subsubsection}{\numberline {3.3.3}Dấu hiệu nhận biết}{17}{subsubsection.3.3.3}%
-\contentsline {subsubsection}{\numberline {3.3.4}Phòng chống}{17}{subsubsection.3.3.4}%
-\contentsline {subsection}{\numberline {3.4}VeRA / DODAG Version Number Attack}{18}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.3.4}Phòng chống}{18}{subsubsection.3.3.4}%
+\contentsline {subsection}{\numberline {3.4}Tấn công phiên bản DODAG}{18}{subsection.3.4}%
 \contentsline {subsubsection}{\numberline {3.4.1}Cơ chế tấn công}{18}{subsubsection.3.4.1}%
 \contentsline {subsubsection}{\numberline {3.4.2}Tác động đến hiệu năng mạng}{18}{subsubsection.3.4.2}%
 \contentsline {subsubsection}{\numberline {3.4.3}Dấu hiệu nhận biết}{18}{subsubsection.3.4.3}%
 \contentsline {subsubsection}{\numberline {3.4.4}Phòng chống}{19}{subsubsection.3.4.4}%
 \contentsline {subsection}{\numberline {3.5}So sánh tổng hợp bốn kiểu tấn công}{19}{subsection.3.5}%
-\contentsline {subsection}{\numberline {3.6}Tóm tắt chương}{19}{subsection.3.6}%
+\contentsline {subsection}{\numberline {3.6}Tóm tắt chương}{20}{subsection.3.6}%
 \contentsline {section}{\numberline {4}THIẾT KẾ VÀ TRIỂN KHAI IDS PHÁT HIỆN TẤN CÔNG RPL}{21}{section.4}%
 \contentsline {subsection}{\numberline {4.1}Phòng chống tấn công DIS flooding}{21}{subsection.4.1}%
 \contentsline {subsection}{\numberline {4.2}Phòng chống tấn công phiên bản DAG}{23}{subsection.4.2}%
